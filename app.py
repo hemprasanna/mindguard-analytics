@@ -1403,10 +1403,6 @@ elif page == "Predict" and st.session_state.data_loaded:
                     </div>
                     """, unsafe_allow_html=True)
 
-        else:
-            st.warning("⚠️ Please train models first in the AI Models page!")
-            st.info("💡 Go to 'AI Models' → Select models → Click 'START TRAINING'")
-
 elif page == "Docs":
     st.markdown('<p class="main-header">📚 DOCUMENTATION</p>', unsafe_allow_html=True)
     
