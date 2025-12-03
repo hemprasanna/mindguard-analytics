@@ -22,16 +22,16 @@ warnings.filterwarnings('ignore')
 
 # Page configuration
 st.set_page_config(
-    page_title="MindGuard Analytics | AI-Powered Mental Health Detection",
+    page_title="MindGuard Analytics | AI Mental Health Detection",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ULTIMATE ENHANCED CSS - Super Vibrant & Animated
+# PERFECT CSS - Colorful but HIGHLY READABLE
 st.markdown("""
     <style>
-    /* Animated gradient background */
+    /* Soft animated gradient background */
     @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -39,269 +39,280 @@ st.markdown("""
     }
     
     .stApp {
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #667eea, #764ba2);
+        background: linear-gradient(-45deg, #e3f2fd, #f3e5f5, #e8f5e9, #fff3e0, #fce4ec);
         background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
+        animation: gradientShift 20s ease infinite;
         background-attachment: fixed;
     }
     
-    /* Glassmorphism content area */
+    /* High contrast content area for readability */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.98);
         padding: 2rem;
-        border-radius: 25px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(102, 126, 234, 0.2);
     }
     
-    /* Animated gradient text header */
-    @keyframes textShimmer {
-        0% { background-position: 0% 50%; }
-        100% { background-position: 100% 50%; }
+    /* ALL TEXT DARK AND READABLE */
+    .main * {
+        color: #1a1a1a !important;
     }
     
+    /* Headers with colorful underline */
     .main-header {
-        font-size: 3.5rem; 
+        font-size: 3rem; 
         font-weight: 900; 
         text-align: center;
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe, #667eea);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: textShimmer 3s linear infinite;
+        color: #1a1a1a !important;
         margin: 20px 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        padding-bottom: 15px;
+        border-bottom: 5px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2, #f093fb) 1;
     }
     
     .sub-header {
-        font-size: 2rem; 
+        font-size: 1.8rem; 
         font-weight: 700;
-        background: linear-gradient(120deg, #667eea, #f093fb);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #1a1a1a !important;
         margin: 25px 0 15px 0;
-        border-left: 6px solid #f093fb;
-        padding-left: 20px;
+        padding-left: 15px;
+        border-left: 5px solid #667eea;
     }
     
-    /* Ultra vibrant sidebar */
+    /* Vibrant but readable sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 30%, #f093fb 60%, #e73c7e 100%);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     }
     
-    [data-testid="stSidebar"] > div:first-child {
-        background: transparent;
-    }
-    
+    /* Sidebar text - WHITE for contrast on dark gradient */
     [data-testid="stSidebar"] * {
         color: white !important;
     }
     
     [data-testid="stSidebar"] label {
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
     
-    /* Animated sidebar items */
-    @keyframes slideIn {
-        from { transform: translateX(-10px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
+    /* Sidebar navigation items */
     [data-testid="stSidebar"] [role="radiogroup"] label {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 12px 15px;
-        border-radius: 12px;
-        margin: 8px 0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        animation: slideIn 0.3s ease-out;
+        background: rgba(255, 255, 255, 0.2) !important;
+        padding: 12px 15px !important;
+        border-radius: 10px !important;
+        margin: 5px 0 !important;
+        transition: all 0.3s !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
     
     [data-testid="stSidebar"] [role="radiogroup"] label:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateX(8px) scale(1.02);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.35) !important;
+        transform: translateX(5px) !important;
     }
     
-    /* Glowing buttons */
-    @keyframes glow {
-        0%, 100% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.5); }
-        50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(240, 147, 251, 0.6); }
-    }
-    
+    /* Buttons with excellent contrast */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: 700;
-        font-size: 1.05rem;
-        animation: glow 2s ease-in-out infinite;
-        transition: all 0.3s;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        padding: 12px 28px !important;
+        border-radius: 25px !important;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+        transition: all 0.3s !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
     }
     
-    /* Colorful tabs */
+    /* Colorful tabs with dark text */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 15px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-        padding: 12px;
-        border-radius: 20px;
+        gap: 10px;
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
+        padding: 10px;
+        border-radius: 15px;
     }
     
     .stTabs [data-baseweb="tab"] {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
-        border-radius: 12px;
-        padding: 12px 25px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #1a1a1a !important;
+        border-radius: 10px;
+        padding: 10px 20px;
         font-weight: 700;
-        transition: all 0.3s;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        background: rgba(255, 255, 255, 0.35);
-        transform: scale(1.05);
+        border: 2px solid transparent;
     }
     
     .stTabs [aria-selected="true"] {
-        background: white !important;
-        color: #667eea !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Animated metric cards */
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-    }
-    
-    [data-testid="stMetricValue"] {
-        font-size: 2.5rem;
-        font-weight: 900;
-        background: linear-gradient(120deg, #667eea, #f093fb);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: pulse 2s ease-in-out infinite;
-    }
-    
-    /* Vibrant info/success/warning boxes */
-    .stAlert {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        font-weight: 600;
-    }
-    
-    /* Enhanced dataframes */
-    .dataframe {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    }
-    
-    /* Colorful expanders */
-    .streamlit-expanderHeader {
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
-        border-radius: 12px;
-        font-weight: 700;
-        border: 2px solid rgba(102, 126, 234, 0.3);
-    }
-    
-    /* Animated file uploader */
-    [data-testid="stFileUploader"] {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
-        border-radius: 20px;
-        padding: 25px;
-        border: 3px dashed #667eea;
-        transition: all 0.3s;
-    }
-    
-    [data-testid="stFileUploader"]:hover {
-        transform: scale(1.02);
-        border-color: #f093fb;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
-    }
-    
-    /* Colorful inputs */
-    .stTextInput > div > div,
-    .stSelectbox > div > div,
-    .stTextArea > div > div,
-    .stNumberInput > div > div {
-        border-radius: 12px;
+        background: #667eea !important;
+        color: white !important;
         border: 2px solid #667eea;
-        transition: all 0.3s;
     }
     
-    .stTextInput > div > div:focus-within,
-    .stSelectbox > div > div:focus-within {
-        border-color: #f093fb;
-        box-shadow: 0 0 15px rgba(240, 147, 251, 0.3);
+    /* Metrics with colored backgrounds but dark text */
+    [data-testid="stMetricValue"] {
+        font-size: 2rem !important;
+        font-weight: 900 !important;
+        color: #1a1a1a !important;
     }
     
-    /* Gradient sliders */
-    .stSlider > div > div > div > div {
-        background: linear-gradient(90deg, #667eea, #f093fb) !important;
+    [data-testid="stMetricLabel"] {
+        font-weight: 700 !important;
+        color: #2d2d2d !important;
     }
     
-    /* Animated cards */
-    [data-testid="column"] {
-        animation: slideIn 0.5s ease-out;
+    /* Input fields with good contrast */
+    .stTextInput > div > div input,
+    .stTextArea > div > div textarea,
+    .stSelectbox > div > div,
+    .stNumberInput > div > div input {
+        background: white !important;
+        color: #1a1a1a !important;
+        border: 2px solid #667eea !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Dataframes readable */
+    .dataframe {
+        background: white !important;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .dataframe th {
+        background: #667eea !important;
+        color: white !important;
+        font-weight: 700 !important;
+    }
+    
+    .dataframe td {
+        color: #1a1a1a !important;
+    }
+    
+    /* Expanders with colored border */
+    .streamlit-expanderHeader {
+        background: rgba(102, 126, 234, 0.08) !important;
+        border: 2px solid #667eea !important;
+        border-radius: 10px !important;
+        color: #1a1a1a !important;
+        font-weight: 700 !important;
+    }
+    
+    /* File uploader */
+    [data-testid="stFileUploader"] {
+        background: rgba(102, 126, 234, 0.05) !important;
+        border: 2px dashed #667eea !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+    }
+    
+    [data-testid="stFileUploader"] label {
+        color: #1a1a1a !important;
+        font-weight: 700 !important;
     }
     
     /* Progress bars */
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        background: linear-gradient(90deg, #667eea, #f093fb) !important;
     }
     
-    /* Hover effects on all cards */
+    /* Alerts with good contrast */
+    .stAlert {
+        border-radius: 10px !important;
+        border-left: 5px solid !important;
+    }
+    
+    /* Success - green with dark text */
+    div[data-baseweb="notification"][kind="success"] {
+        background: #e8f5e9 !important;
+        border-left-color: #4caf50 !important;
+    }
+    
+    div[data-baseweb="notification"][kind="success"] * {
+        color: #1b5e20 !important;
+    }
+    
+    /* Info - blue with dark text */
+    div[data-baseweb="notification"][kind="info"] {
+        background: #e3f2fd !important;
+        border-left-color: #2196f3 !important;
+    }
+    
+    div[data-baseweb="notification"][kind="info"] * {
+        color: #0d47a1 !important;
+    }
+    
+    /* Warning - orange with dark text */
+    div[data-baseweb="notification"][kind="warning"] {
+        background: #fff3e0 !important;
+        border-left-color: #ff9800 !important;
+    }
+    
+    div[data-baseweb="notification"][kind="warning"] * {
+        color: #e65100 !important;
+    }
+    
+    /* Error - red with dark text */
+    div[data-baseweb="notification"][kind="error"] {
+        background: #ffebee !important;
+        border-left-color: #f44336 !important;
+    }
+    
+    div[data-baseweb="notification"][kind="error"] * {
+        color: #b71c1c !important;
+    }
+    
+    /* Cards with subtle colors */
     [data-testid="column"] > div {
-        background: rgba(255, 255, 255, 0.6);
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s;
-        border: 1px solid rgba(102, 126, 234, 0.2);
+        background: rgba(255, 255, 255, 0.9) !important;
+        padding: 20px !important;
+        border-radius: 15px !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+        border: 1px solid rgba(102, 126, 234, 0.15) !important;
+        transition: all 0.3s !important;
     }
     
     [data-testid="column"] > div:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
-        background: rgba(255, 255, 255, 0.8);
+        transform: translateY(-3px) !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
     }
     
-    /* Spinning animation for icons */
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+    /* Sliders */
+    .stSlider label {
+        color: #1a1a1a !important;
+        font-weight: 700 !important;
     }
     
-    .spin-icon {
-        display: inline-block;
-        animation: spin 3s linear infinite;
+    /* Radio buttons */
+    .stRadio label {
+        color: #1a1a1a !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Checkbox */
+    .stCheckbox label {
+        color: #1a1a1a !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Selectbox */
+    .stSelectbox label {
+        color: #1a1a1a !important;
+        font-weight: 700 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Session state initialization
+# Session state
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 if 'processed_data' not in st.session_state:
     st.session_state.processed_data = None
-if 'page_visits' not in st.session_state:
-    st.session_state.page_visits = {}
 
 # Helper functions
 @st.cache_data
@@ -373,23 +384,22 @@ def create_wordcloud(text_series):
     """Generate word cloud"""
     text = ' '.join(text_series.astype(str))
     wordcloud = WordCloud(width=800, height=400, background_color='white',
-                         colormap='rainbow').generate(text)
+                         colormap='viridis').generate(text)
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(wordcloud, interpolation='bilinear')
     ax.axis('off')
     return fig
 
-# ENHANCED SIDEBAR with animations
+# SIDEBAR
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; margin-bottom: 20px;'>🛡️ MindGuard</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 0.9rem; opacity: 0.9;'>AI Mental Health Analytics</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 0.9rem; opacity: 0.95;'>AI Mental Health Analytics</p>", unsafe_allow_html=True)
     st.markdown("---")
     
     page = st.radio(
         "🧭 Navigation",
         ["🏠 Home", "📊 Data Hub", "🔍 Explorer", "🎨 Visuals Pro", 
-         "⚙️ Engineer", "🤖 AI Models", "🔮 Predict", "📚 Docs"],
-        label_visibility="visible"
+         "⚙️ Engineer", "🤖 AI Models", "🔮 Predict", "📚 Docs"]
     )
     
     page = page.split(' ', 1)[1] if ' ' in page else page
@@ -397,116 +407,89 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 🎲 Data Controls")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🚀 Load", use_container_width=True):
-            with st.spinner("Loading..."):
-                time.sleep(0.5)
-                st.session_state.data_loaded = True
-                st.session_state.processed_data = load_sample_data()
-                st.success("✅ Loaded!")
-                st.balloons()
+    if st.button("🚀 Load Data", use_container_width=True):
+        with st.spinner("Loading..."):
+            time.sleep(0.5)
+            st.session_state.data_loaded = True
+            st.session_state.processed_data = load_sample_data()
+            st.success("✅ Data loaded!")
+            st.balloons()
     
-    with col2:
-        if st.button("🎯 Demo", use_container_width=True):
-            st.info("Sample data ready!")
-    
-    uploaded_file = st.file_uploader("📁 Upload CSV", type=['csv'], label_visibility="visible")
+    uploaded_file = st.file_uploader("📁 Upload CSV", type=['csv'])
     if uploaded_file:
         st.session_state.processed_data = pd.read_csv(uploaded_file)
         st.session_state.data_loaded = True
-        st.success("✅ Uploaded!")
+        st.success("✅ File uploaded!")
     
     if st.session_state.data_loaded:
         st.markdown("---")
-        st.markdown("### 📊 Live Stats")
+        st.markdown("### 📊 Quick Stats")
         df = st.session_state.processed_data
         
-        # Animated metrics
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)); 
+        <div style='background: rgba(255,255,255,0.25); 
                     padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center;
-                    border: 1px solid rgba(255,255,255,0.3);'>
-            <div style='font-size: 0.85rem; opacity: 0.9;'>📝 TOTAL POSTS</div>
+                    border: 2px solid rgba(255,255,255,0.4);'>
+            <div style='font-size: 0.85rem; font-weight: 700;'>📝 TOTAL POSTS</div>
             <div style='font-size: 2rem; font-weight: 900; margin-top: 5px;'>{len(df)}</div>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,107,107,0.2)); 
+        <div style='background: rgba(255,255,255,0.25); 
                     padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center;
-                    border: 1px solid rgba(255,255,255,0.3);'>
-            <div style='font-size: 0.85rem; opacity: 0.9;'>⚠️ HIGH RISK</div>
+                    border: 2px solid rgba(255,255,255,0.4);'>
+            <div style='font-size: 0.85rem; font-weight: 700;'>⚠️ HIGH RISK</div>
             <div style='font-size: 2rem; font-weight: 900; margin-top: 5px;'>{len(df[df['risk_level'] == 'High'])}</div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Progress bar
         risk_pct = len(df[df['risk_level'] == 'High']) / len(df) * 100
-        st.markdown(f"**Risk Level:** {risk_pct:.1f}%")
         st.progress(risk_pct / 100)
     
     st.markdown("---")
     st.markdown("### 🆘 Crisis Support")
     st.markdown("""
-    <div style='background: rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; 
-                font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.3);'>
+    <div style='background: rgba(255,255,255,0.25); padding: 15px; border-radius: 12px; 
+                font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.4);'>
     <b>🇺🇸 USA:</b> 988<br>
     <b>💬 Text:</b> HOME → 741741<br>
     <b>🌍 Global:</b> IASP.info
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("<p style='text-align: center; font-size: 0.75rem; opacity: 0.7;'>Made with ❤️ for Mental Health</p>", unsafe_allow_html=True)
 
-# MAIN CONTENT - ULTIMATE VERSION
+# MAIN CONTENT
 if page == "Home":
-    # Animated header
     st.markdown('<p class="main-header">🛡️ MINDGUARD ANALYTICS</p>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; font-size: 1.3rem; color: #666; font-weight: 600; margin-bottom: 35px;">🤖 AI-Powered Mental Health Crisis Detection System</p>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; font-size: 1.2rem; color: #555; font-weight: 600; margin-bottom: 30px;">🤖 AI-Powered Mental Health Crisis Detection System</p>', unsafe_allow_html=True)
     
-    # Hero banner with animation
+    # Hero banner - white text on colored background
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
-                padding: 40px; border-radius: 25px; color: white; text-align: center; 
-                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4); margin-bottom: 35px;
-                border: 3px solid rgba(255, 255, 255, 0.3);'>
-        <h1 style='font-size: 2.5rem; margin: 0; font-weight: 900;'>🎯 Next-Gen Analytics Platform</h1>
-        <p style='font-size: 1.3rem; margin: 15px 0 0 0; opacity: 0.95;'>
+                padding: 40px; border-radius: 20px; color: white; text-align: center; 
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); margin-bottom: 30px;'>
+        <h1 style='font-size: 2.2rem; margin: 0; font-weight: 900; color: white !important;'>🎯 Next-Gen Analytics Platform</h1>
+        <p style='font-size: 1.2rem; margin: 15px 0 0 0; color: rgba(255,255,255,0.95) !important;'>
             Machine Learning • NLP • Real-Time Detection • 16+ Visualizations
         </p>
-        <div style='margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;'>
-            <span style='background: rgba(255,255,255,0.25); padding: 8px 20px; border-radius: 20px; font-weight: 700;'>
-                ✨ 100% Accurate ML
-            </span>
-            <span style='background: rgba(255,255,255,0.25); padding: 8px 20px; border-radius: 20px; font-weight: 700;'>
-                🚀 Real-Time Analysis
-            </span>
-            <span style='background: rgba(255,255,255,0.25); padding: 8px 20px; border-radius: 20px; font-weight: 700;'>
-                🎨 16+ Chart Types
-            </span>
-        </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Three column layout with vibrant cards
+    # Feature cards
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea, #764ba2); 
-                    padding: 30px; border-radius: 20px; color: white; height: 100%;
-                    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-                    border: 2px solid rgba(255, 255, 255, 0.3);'>
-            <div style='font-size: 3rem; text-align: center;'>🔬</div>
-            <h3 style='text-align: center; margin: 15px 0;'>Data Science</h3>
-            <ul style='font-size: 1rem; line-height: 2;'>
-                <li>✨ Multi-source integration</li>
-                <li>🧹 Advanced cleaning</li>
-                <li>🔧 Feature engineering</li>
-                <li>📊 Statistical analysis</li>
-                <li>🎯 KNN imputation</li>
+                    padding: 30px; border-radius: 15px; color: white;
+                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);'>
+            <div style='font-size: 2.5rem; text-align: center;'>🔬</div>
+            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>Data Science</h3>
+            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
+                <li>Multi-source integration</li>
+                <li>Advanced data cleaning</li>
+                <li>Feature engineering</li>
+                <li>KNN imputation</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -514,17 +497,15 @@ if page == "Home":
     with col2:
         st.markdown("""
         <div style='background: linear-gradient(135deg, #f093fb, #f5576c); 
-                    padding: 30px; border-radius: 20px; color: white; height: 100%;
-                    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
-                    border: 2px solid rgba(255, 255, 255, 0.3);'>
-            <div style='font-size: 3rem; text-align: center;'>🤖</div>
-            <h3 style='text-align: center; margin: 15px 0;'>AI & ML</h3>
-            <ul style='font-size: 1rem; line-height: 2;'>
-                <li>🌲 Random Forest</li>
-                <li>⚡ Gradient Boosting</li>
-                <li>📈 Logistic Regression</li>
-                <li>🎛️ Hyperparameter tuning</li>
-                <li>🎯 95%+ Accuracy</li>
+                    padding: 30px; border-radius: 15px; color: white;
+                    box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);'>
+            <div style='font-size: 2.5rem; text-align: center;'>🤖</div>
+            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>AI & Machine Learning</h3>
+            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
+                <li>Random Forest</li>
+                <li>Gradient Boosting</li>
+                <li>Hyperparameter tuning</li>
+                <li>95%+ Accuracy</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -532,24 +513,22 @@ if page == "Home":
     with col3:
         st.markdown("""
         <div style='background: linear-gradient(135deg, #4facfe, #00f2fe); 
-                    padding: 30px; border-radius: 20px; color: white; height: 100%;
-                    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
-                    border: 2px solid rgba(255, 255, 255, 0.3);'>
-            <div style='font-size: 3rem; text-align: center;'>🎨</div>
-            <h3 style='text-align: center; margin: 15px 0;'>Visualizations</h3>
-            <ul style='font-size: 1rem; line-height: 2;'>
-                <li>📊 16+ chart types</li>
-                <li>🌌 3D visualizations</li>
-                <li>🎯 Interactive plots</li>
-                <li>☀️ Sunburst charts</li>
-                <li>🌊 Sankey diagrams</li>
+                    padding: 30px; border-radius: 15px; color: white;
+                    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);'>
+            <div style='font-size: 2.5rem; text-align: center;'>🎨</div>
+            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>Visualizations</h3>
+            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
+                <li>16+ chart types</li>
+                <li>3D visualizations</li>
+                <li>Interactive plots</li>
+                <li>Sunburst & Sankey</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Stats dashboard
+    # Dashboard
     if st.session_state.data_loaded:
         df = st.session_state.processed_data
         
@@ -567,20 +546,17 @@ if page == "Home":
         for col, (icon, label, value, color) in zip([col1, col2, col3, col4], metrics):
             with col:
                 st.markdown(f"""
-                <div style='background: linear-gradient(135deg, {color}, {color}dd); 
-                            padding: 25px; border-radius: 20px; color: white; text-align: center;
-                            box-shadow: 0 8px 25px {color}40;
-                            border: 2px solid rgba(255, 255, 255, 0.3);
-                            transition: transform 0.3s;'>
-                    <div style='font-size: 2.5rem;'>{icon}</div>
-                    <div style='font-size: 0.9rem; opacity: 0.9; margin: 10px 0;'>{label}</div>
-                    <div style='font-size: 2.5rem; font-weight: 900;'>{value}</div>
+                <div style='background: {color}; 
+                            padding: 25px; border-radius: 15px; color: white; text-align: center;
+                            box-shadow: 0 6px 20px {color}40;'>
+                    <div style='font-size: 2rem;'>{icon}</div>
+                    <div style='font-size: 0.85rem; margin: 10px 0; font-weight: 700; color: white !important;'>{label}</div>
+                    <div style='font-size: 2.2rem; font-weight: 900; color: white !important;'>{value}</div>
                 </div>
                 """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Quick visualization
         col1, col2 = st.columns(2)
         
         with col1:
@@ -589,12 +565,11 @@ if page == "Home":
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
                         hole=0.5)
             fig.update_traces(textposition='inside', textinfo='percent+label',
-                            marker=dict(line=dict(color='white', width=3)))
+                            textfont_size=14,
+                            marker=dict(line=dict(color='white', width=2)))
             fig.update_layout(
                 showlegend=True,
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(size=14, color='#333', family='Arial Black')
+                font=dict(size=13, color='#1a1a1a', family='Arial')
             )
             st.plotly_chart(fig, use_container_width=True)
         
@@ -604,51 +579,17 @@ if page == "Home":
                         title='⏰ Risk by Time of Day',
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
                         barmode='group')
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(size=14, color='#333', family='Arial Black')
-            )
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
     
-    # Feature highlights
-    st.markdown('<p class="sub-header">✨ Platform Highlights</p>', unsafe_allow_html=True)
-    
-    features = [
-        ("🎯", "99% Accuracy", "Advanced ML models with hyperparameter tuning", "#667eea"),
-        ("⚡", "Real-Time", "Instant risk assessment and predictions", "#f093fb"),
-        ("🔒", "Secure", "Privacy-first design with no data storage", "#4facfe"),
-        ("📊", "16+ Charts", "Publication-quality interactive visualizations", "#43e97b"),
-        ("🤖", "3 AI Models", "Random Forest, Gradient Boosting, Regression", "#f5576c"),
-        ("🎨", "Beautiful UI", "Modern glassmorphism with animated gradients", "#764ba2")
-    ]
-    
-    col1, col2, col3 = st.columns(3)
-    cols = [col1, col2, col3]
-    
-    for idx, (icon, title, desc, color) in enumerate(features):
-        with cols[idx % 3]:
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, {color}22, {color}11); 
-                        padding: 25px; border-radius: 20px; margin: 10px 0;
-                        border: 2px solid {color}44; min-height: 180px;
-                        transition: all 0.3s;'>
-                <div style='font-size: 3rem; text-align: center;'>{icon}</div>
-                <h3 style='color: {color}; text-align: center; margin: 15px 0;'>{title}</h3>
-                <p style='text-align: center; color: #555; font-size: 0.95rem;'>{desc}</p>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    # Call to action
-    st.markdown("<br>", unsafe_allow_html=True)
+    # CTA
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); 
-                padding: 35px; border-radius: 25px; color: white; text-align: center;
-                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-                border: 3px solid rgba(255, 255, 255, 0.3);'>
-        <h2 style='margin: 0 0 15px 0; font-size: 2rem;'>🚀 Ready to Explore?</h2>
-        <p style='font-size: 1.2rem; margin: 0; opacity: 0.95;'>
-            Click "🚀 Load" in the sidebar to start analyzing data with AI!
+                padding: 35px; border-radius: 20px; color: white; text-align: center;
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); margin-top: 30px;'>
+        <h2 style='margin: 0 0 15px 0; font-size: 1.8rem; color: white !important;'>🚀 Ready to Explore?</h2>
+        <p style='font-size: 1.1rem; margin: 0; color: rgba(255,255,255,0.95) !important;'>
+            Click "🚀 Load Data" in the sidebar to start analyzing with AI!
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -668,7 +609,7 @@ elif page == "Data Hub" and st.session_state.data_loaded:
         col2.metric("📊 Columns", df.shape[1])
         col3.metric("💾 Memory", f"{df.memory_usage(deep=True).sum() / 1024:.1f} KB")
         col4.metric("🔄 Duplicates", df.duplicated().sum())
-        col5.metric("✨ Completeness", f"{((1 - df.isnull().sum().sum() / (df.shape[0] * df.shape[1])) * 100):.1f}%")
+        col5.metric("✨ Complete", f"{((1 - df.isnull().sum().sum() / (df.shape[0] * df.shape[1])) * 100):.1f}%")
         
         st.markdown("### 📊 Data Sample")
         st.dataframe(df.head(20), use_container_width=True, height=400)
@@ -687,10 +628,10 @@ elif page == "Data Hub" and st.session_state.data_loaded:
             st.markdown(f"""
             <div style='background: linear-gradient(135deg, #43e97b, #38f9d7); 
                         padding: 40px; border-radius: 20px; color: white; text-align: center;
-                        box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);'>
-                <h2 style='margin: 0;'>Quality Score</h2>
-                <div style='font-size: 4rem; font-weight: 900; margin: 20px 0;'>{quality_score:.1f}%</div>
-                <p style='font-size: 1.2rem; margin: 0;'>Excellent Quality!</p>
+                        box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);'>
+                <h2 style='margin: 0; color: white !important;'>Quality Score</h2>
+                <div style='font-size: 3.5rem; font-weight: 900; margin: 20px 0; color: white !important;'>{quality_score:.1f}%</div>
+                <p style='font-size: 1.1rem; margin: 0; color: white !important;'>Excellent Quality!</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -705,12 +646,8 @@ elif page == "Data Hub" and st.session_state.data_loaded:
                         x='Column', y='Missing %',
                         title='🔍 Missing Values Analysis',
                         color='Missing %',
-                        color_continuous_scale='RdYlGn_r')
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                showlegend=False
-            )
+                        color_continuous_scale='Reds')
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
     
     with tabs[2]:
@@ -719,47 +656,37 @@ elif page == "Data Hub" and st.session_state.data_loaded:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("#### 🎯 Select Imputation Method")
             method = st.radio(
-                "Choose strategy:",
-                ["🔵 Mean Imputation", "🟢 Median Imputation", "🟣 KNN Imputation"],
+                "Select Imputation Method:",
+                ["Mean", "Median", "KNN"],
                 horizontal=True
             )
             
-            method_map = {
-                "🔵 Mean Imputation": "mean",
-                "🟢 Median Imputation": "median",
-                "🟣 KNN Imputation": "knn"
-            }
-            
             if st.button("✨ Apply Cleaning", use_container_width=True):
-                with st.spinner("🔄 Cleaning data..."):
+                with st.spinner("Cleaning..."):
                     progress_bar = st.progress(0)
                     for i in range(100):
                         time.sleep(0.01)
                         progress_bar.progress(i + 1)
                     
-                    df_clean = handle_missing_values(df, method_map[method])
+                    df_clean = handle_missing_values(df, method.lower())
                     st.session_state.processed_data = df_clean
-                    
-                    st.success("✅ Data cleaned successfully!")
+                    st.success("✅ Data cleaned!")
                     st.balloons()
         
         with col2:
-            st.markdown("#### 📊 Before vs After")
             before_missing = df.isnull().sum().sum()
-            after_missing = 0
             
-            comparison_data = pd.DataFrame({
+            comparison = pd.DataFrame({
                 'Status': ['Before', 'After'],
-                'Missing Values': [before_missing, after_missing]
+                'Missing': [before_missing, 0]
             })
             
-            fig = px.bar(comparison_data, x='Status', y='Missing Values',
+            fig = px.bar(comparison, x='Status', y='Missing',
                         title='Cleaning Impact',
                         color='Status',
                         color_discrete_map={'Before': '#ff6b6b', 'After': '#43e97b'})
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
     
     with tabs[3]:
@@ -769,8 +696,8 @@ elif page == "Data Hub" and st.session_state.data_loaded:
             'Column': ['post_id', 'text', 'post_length', 'engagement_rate', 'time_of_day', 
                       'day_of_week', 'previous_posts_count', 'account_age_days', 
                       'follower_count', 'sentiment_score', 'risk_level'],
-            'Type': ['🔢 Integer', '📝 Text', '🔢 Integer', '📊 Float', '⏰ Category',
-                    '📅 Category', '🔢 Integer', '🔢 Integer', '🔢 Integer', '📊 Float', '🎯 Category'],
+            'Type': ['Integer', 'Text', 'Integer', 'Float', 'Category',
+                    'Category', 'Integer', 'Integer', 'Integer', 'Float', 'Category'],
             'Description': [
                 'Unique post identifier',
                 'Social media post content',
@@ -806,12 +733,8 @@ elif page == "Explorer" and st.session_state.data_loaded:
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
                         hole=0.5)
             fig.update_traces(textposition='inside', textinfo='percent+label',
-                            marker=dict(line=dict(color='white', width=3)))
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(size=13, family='Arial Black')
-            )
+                            marker=dict(line=dict(color='white', width=2)))
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
@@ -819,25 +742,14 @@ elif page == "Explorer" and st.session_state.data_loaded:
                              title='📈 Engagement Distribution',
                              color_discrete_sequence=['#667eea'])
             fig.update_traces(marker=dict(line=dict(color='white', width=1)))
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                xaxis=dict(gridcolor='rgba(0,0,0,0.1)'),
-                yaxis=dict(gridcolor='rgba(0,0,0,0.1)')
-            )
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
         
         colors = ['#667eea', '#f093fb', '#4facfe']
         fig = go.Figure()
         for idx, col in enumerate(['post_length', 'previous_posts_count', 'follower_count']):
-            fig.add_trace(go.Box(y=df[col], name=col, marker_color=colors[idx],
-                                line=dict(width=2)))
-        fig.update_layout(
-            title='📦 Feature Box Plots',
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            yaxis=dict(gridcolor='rgba(0,0,0,0.1)')
-        )
+            fig.add_trace(go.Box(y=df[col], name=col, marker_color=colors[idx]))
+        fig.update_layout(title='📦 Feature Distributions', font=dict(size=13, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
     with viz_tabs[1]:
@@ -849,10 +761,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
         fig = px.imshow(corr_matrix, text_auto='.2f', aspect="auto",
                        title='🌡️ Feature Correlations',
                        color_continuous_scale='RdBu_r')
-        fig.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)'
-        )
+        fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
     with viz_tabs[2]:
@@ -866,7 +775,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
                         title='⏰ Risk by Time',
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
                         barmode='group')
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
@@ -875,26 +784,26 @@ elif page == "Explorer" and st.session_state.data_loaded:
                         title='📅 Risk by Day',
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
                         barmode='stack')
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
     
     with viz_tabs[3]:
         st.markdown("### ⚠️ Risk Assessment")
         
         col1, col2, col3 = st.columns(3)
-        high_risk = len(df[df['risk_level'] == 'High'])
-        med_risk = len(df[df['risk_level'] == 'Medium'])
-        low_risk = len(df[df['risk_level'] == 'Low'])
+        high = len(df[df['risk_level'] == 'High'])
+        med = len(df[df['risk_level'] == 'Medium'])
+        low = len(df[df['risk_level'] == 'Low'])
         
-        col1.metric("🔴 High Risk", high_risk, f"{high_risk/len(df)*100:.1f}%")
-        col2.metric("🟡 Medium Risk", med_risk, f"{med_risk/len(df)*100:.1f}%")
-        col3.metric("🟢 Low Risk", low_risk, f"{low_risk/len(df)*100:.1f}%")
+        col1.metric("🔴 High", high, f"{high/len(df)*100:.1f}%")
+        col2.metric("🟡 Medium", med, f"{med/len(df)*100:.1f}%")
+        col3.metric("🟢 Low", low, f"{low/len(df)*100:.1f}%")
         
         fig = px.violin(df, y='sentiment_score', x='risk_level', box=True,
                        title='🎻 Sentiment vs Risk',
                        color='risk_level',
                        color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        fig.update_layout(font=dict(size=13, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
     with viz_tabs[4]:
@@ -907,7 +816,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
                            color='risk_level', size='subjectivity',
                            title='📊 Text Metrics',
                            color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
@@ -921,33 +830,29 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
     df = perform_text_analysis(df)
     
     viz_type = st.selectbox(
-        "🎯 Select Visualization",
-        ["🌌 3D Scatter", "☀️ Sunburst", "🎨 Parallel Coordinates", 
-         "🎯 Radar Chart", "🗺️ Treemap", "🌊 Sankey Diagram"],
-        index=0
+        "Select Visualization",
+        ["3D Scatter", "Sunburst", "Parallel Coordinates", 
+         "Radar Chart", "Treemap", "Sankey Diagram"]
     )
     
-    if viz_type == "🌌 3D Scatter":
+    if viz_type == "3D Scatter":
         fig = px.scatter_3d(df, x='post_length', y='engagement_rate', z='sentiment_score',
                            color='risk_level', size='follower_count',
                            title='🌌 3D Feature Space',
                            color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
         fig.update_traces(marker=dict(line=dict(width=0.5, color='white')))
-        fig.update_layout(
-            scene=dict(bgcolor='rgba(0,0,0,0)'),
-            paper_bgcolor='rgba(0,0,0,0)'
-        )
+        fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
-    elif viz_type == "☀️ Sunburst":
+    elif viz_type == "Sunburst":
         fig = px.sunburst(df, path=['risk_level', 'time_of_day', 'day_of_week'],
                          title='☀️ Hierarchical Distribution',
                          color='risk_level',
                          color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
-    elif viz_type == "🎨 Parallel Coordinates":
+    elif viz_type == "Parallel Coordinates":
         numeric_cols = ['post_length', 'engagement_rate', 'sentiment_score', 
                        'previous_posts_count', 'follower_count']
         df_viz = df.copy()
@@ -965,12 +870,11 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
                 tickvals=[0, 1, 2],
                 ticktext=['Low', 'Med', 'High']
             ),
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)'
+            font=dict(size=12, color='#1a1a1a')
         )
         st.plotly_chart(fig, use_container_width=True)
     
-    elif viz_type == "🎯 Radar Chart":
+    elif viz_type == "Radar Chart":
         risk_stats = df.groupby('risk_level')[['post_length', 'engagement_rate', 
                                                 'sentiment_score', 'follower_count']].mean()
         fig = go.Figure()
@@ -985,23 +889,19 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
                 fillcolor=colors[risk],
                 opacity=0.6
             ))
-        fig.update_layout(
-            title='🎯 Risk Characteristics',
-            polar=dict(bgcolor='rgba(0,0,0,0)'),
-            paper_bgcolor='rgba(0,0,0,0)'
-        )
+        fig.update_layout(title='🎯 Risk Characteristics', font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
-    elif viz_type == "🗺️ Treemap":
+    elif viz_type == "Treemap":
         fig = px.treemap(df, path=['risk_level', 'time_of_day'],
                         title='🗺️ Risk Treemap',
                         color='risk_level',
                         color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
         fig.update_traces(marker=dict(line=dict(width=2, color='white')))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
-    elif viz_type == "🌊 Sankey Diagram":
+    elif viz_type == "Sankey Diagram":
         flow_data = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
         labels = list(flow_data['time_of_day'].unique()) + list(flow_data['risk_level'].unique())
         source = [labels.index(x) for x in flow_data['time_of_day']]
@@ -1025,7 +925,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
             link=dict(source=source, target=target, value=flow_data['count'],
                      color=link_colors)
         )])
-        fig.update_layout(title='🌊 Flow Diagram', paper_bgcolor='rgba(0,0,0,0)')
+        fig.update_layout(title='🌊 Flow Diagram', font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
 
 elif page == "Engineer" and st.session_state.data_loaded:
@@ -1037,33 +937,32 @@ elif page == "Engineer" and st.session_state.data_loaded:
     
     with col1:
         st.markdown("### 📝 Text Features")
-        if st.checkbox("✨ Apply NLP Analysis", value=True):
+        if st.checkbox("Apply NLP", value=True):
             with st.spinner("Processing..."):
                 df = perform_text_analysis(df)
                 st.success("✅ Text features created!")
                 st.write("New: text_length, word_count, polarity, subjectivity")
         
         st.markdown("### ⏰ Temporal Features")
-        if st.checkbox("🕐 Create Time Features"):
+        if st.checkbox("Create Time Features"):
             time_mapping = {'Morning': 0, 'Afternoon': 1, 'Evening': 2, 'Night': 3}
             df['time_numeric'] = df['time_of_day'].map(time_mapping)
             
             day_mapping = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
             df['day_numeric'] = df['day_of_week'].map(day_mapping)
             df['is_weekend'] = df['day_of_week'].isin(['Sat', 'Sun']).astype(int)
-            
             st.success("✅ Temporal features created!")
     
     with col2:
         st.markdown("### 🔗 Interaction Features")
-        if st.checkbox("🎯 Create Interactions"):
+        if st.checkbox("Create Interactions"):
             df['engagement_per_follower'] = df['engagement_rate'] / (df['follower_count'] + 1)
             df['posts_per_day'] = df['previous_posts_count'] / (df['account_age_days'] + 1)
             df['sentiment_engagement'] = df['sentiment_score'] * df['engagement_rate']
             st.success("✅ Interaction features created!")
         
         st.markdown("### 📊 Scaling")
-        if st.checkbox("⚡ Apply Scaling"):
+        if st.checkbox("Apply Scaling"):
             scaler = StandardScaler()
             numeric_cols = df.select_dtypes(include=[np.number]).columns
             df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
@@ -1095,10 +994,10 @@ elif page == "AI Models" and st.session_state.data_loaded:
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    model_tabs = st.tabs(["🎯 Train", "📊 Results", "🎛️ Tune", "📈 Compare"])
+    model_tabs = st.tabs(["🎯 Train", "📊 Results", "🎛️ Tune"])
     
     with model_tabs[0]:
-        st.markdown("### 🎯 Select Models to Train")
+        st.markdown("### 🎯 Select Models")
         
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -1111,7 +1010,6 @@ elif page == "AI Models" and st.session_state.data_loaded:
         if st.button("🚀 START TRAINING", use_container_width=True, type="primary"):
             results = {}
             progress_bar = st.progress(0)
-            status_text = st.empty()
             
             models_to_train = []
             if use_rf:
@@ -1122,7 +1020,6 @@ elif page == "AI Models" and st.session_state.data_loaded:
                 models_to_train.append(("Logistic Regression", LogisticRegression(max_iter=1000, random_state=42)))
             
             for idx, (name, model) in enumerate(models_to_train):
-                status_text.text(f"🔄 Training {name}...")
                 model.fit(X_train_scaled, y_train)
                 pred = model.predict(X_test_scaled)
                 results[name] = {
@@ -1131,20 +1028,18 @@ elif page == "AI Models" and st.session_state.data_loaded:
                     'accuracy': (pred == y_test).mean()
                 }
                 progress_bar.progress((idx + 1) / len(models_to_train))
-                time.sleep(0.5)
+                time.sleep(0.3)
             
             st.session_state.models = results
-            status_text.empty()
-            progress_bar.empty()
-            st.success("✅ All models trained successfully!")
+            st.success("✅ All models trained!")
             st.balloons()
     
     with model_tabs[1]:
         if 'models' in st.session_state:
-            st.markdown("### 📊 Model Performance")
+            st.markdown("### 📊 Performance")
             
             for model_name, result in st.session_state.models.items():
-                with st.expander(f"🎯 {model_name} - Accuracy: {result['accuracy']:.4f}", expanded=True):
+                with st.expander(f"🎯 {model_name} - {result['accuracy']:.4f}", expanded=True):
                     col1, col2 = st.columns(2)
                     
                     with col1:
@@ -1156,86 +1051,37 @@ elif page == "AI Models" and st.session_state.data_loaded:
                     with col2:
                         cm = confusion_matrix(y_test, result['predictions'])
                         fig = px.imshow(cm, text_auto=True, aspect="auto",
-                                       labels=dict(x="Predicted", y="Actual"),
                                        x=le.classes_, y=le.classes_,
                                        color_continuous_scale='Blues')
-                        fig.update_layout(title=f"{model_name} Confusion Matrix")
+                        fig.update_layout(title=f"{model_name}", font=dict(color='#1a1a1a'))
                         st.plotly_chart(fig, use_container_width=True)
         else:
-            st.warning("⚠️ Train models first!")
+            st.warning("Train models first!")
     
     with model_tabs[2]:
-        st.markdown("### 🎛️ Hyperparameter Tuning")
+        st.markdown("### 🎛️ Tuning")
         
-        model_choice = st.selectbox("Select Model", ["Random Forest", "Gradient Boosting"])
+        model_choice = st.selectbox("Model", ["Random Forest", "Gradient Boosting"])
         
         if model_choice == "Random Forest":
-            col1, col2 = st.columns(2)
-            with col1:
-                n_estimators = st.slider("🌲 Trees", 50, 300, 100, 25)
-            with col2:
-                max_depth = st.slider("📏 Depth", 5, 50, 10, 5)
+            n_est = st.slider("Trees", 50, 300, 100, 25)
+            max_d = st.slider("Depth", 5, 50, 10, 5)
             
-            if st.button("⚡ Optimize", use_container_width=True):
-                with st.spinner("🔄 Tuning..."):
-                    model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
+            if st.button("Optimize"):
+                with st.spinner("Tuning..."):
+                    model = RandomForestClassifier(n_estimators=n_est, max_depth=max_d, random_state=42)
                     scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
-                    
-                    st.markdown(f"""
-                    <div style='background: linear-gradient(135deg, #43e97b, #38f9d7); 
-                                padding: 30px; border-radius: 20px; color: white; text-align: center;'>
-                        <h2>CV Score: {scores.mean():.4f}</h2>
-                        <p>± {scores.std():.4f}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
         
         else:
-            col1, col2 = st.columns(2)
-            with col1:
-                learning_rate = st.slider("📈 Learning Rate", 0.01, 0.3, 0.1, 0.01)
-            with col2:
-                n_estimators = st.slider("⚡ Estimators", 50, 300, 100, 25)
+            lr = st.slider("Learning Rate", 0.01, 0.3, 0.1, 0.01)
+            n_est = st.slider("Estimators", 50, 300, 100, 25)
             
-            if st.button("⚡ Optimize", use_container_width=True):
-                with st.spinner("🔄 Tuning..."):
-                    model = GradientBoostingClassifier(learning_rate=learning_rate, n_estimators=n_estimators, random_state=42)
+            if st.button("Optimize"):
+                with st.spinner("Tuning..."):
+                    model = GradientBoostingClassifier(learning_rate=lr, n_estimators=n_est, random_state=42)
                     scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
-                    
-                    st.markdown(f"""
-                    <div style='background: linear-gradient(135deg, #667eea, #764ba2); 
-                                padding: 30px; border-radius: 20px; color: white; text-align: center;'>
-                        <h2>CV Score: {scores.mean():.4f}</h2>
-                        <p>± {scores.std():.4f}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-    
-    with model_tabs[3]:
-        if 'models' in st.session_state:
-            st.markdown("### 📈 Model Comparison")
-            
-            comparison_df = pd.DataFrame({
-                'Model': list(st.session_state.models.keys()),
-                'Accuracy': [r['accuracy'] for r in st.session_state.models.values()]
-            }).sort_values('Accuracy', ascending=False)
-            
-            fig = px.bar(comparison_df, x='Model', y='Accuracy',
-                        title='🏆 Model Accuracy Comparison',
-                        color='Accuracy',
-                        color_continuous_scale='Viridis',
-                        text='Accuracy')
-            fig.update_traces(texttemplate='%{text:.4f}', textposition='outside')
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig, use_container_width=True)
-            
-            best_model = comparison_df.iloc[0]
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #f093fb, #f5576c); 
-                        padding: 30px; border-radius: 20px; color: white; text-align: center;'>
-                <h2>🏆 Best Model</h2>
-                <h1>{best_model['Model']}</h1>
-                <h3>{best_model['Accuracy']:.4f} Accuracy</h3>
-            </div>
-            """, unsafe_allow_html=True)
+                    st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
 
 elif page == "Predict" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🔮 PREDICTION ENGINE</p>', unsafe_allow_html=True)
@@ -1245,26 +1091,21 @@ elif page == "Predict" and st.session_state.data_loaded:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        text_input = st.text_area("📝 Post Content", "I feel overwhelmed...", height=100)
-        post_length = st.slider("📏 Length", 10, 500, len(text_input))
-        engagement_rate = st.slider("📊 Engagement", 0.0, 1.0, 0.5)
+        text_input = st.text_area("Post Content", "I feel overwhelmed...", height=100)
+        post_length = st.slider("Length", 10, 500, len(text_input))
+        engagement_rate = st.slider("Engagement", 0.0, 1.0, 0.5)
     
     with col2:
-        previous_posts = st.number_input("📝 Previous Posts", 0, 1000, 100)
-        account_age = st.number_input("🕐 Account Age (days)", 1, 3650, 365)
+        previous_posts = st.number_input("Previous Posts", 0, 1000, 100)
+        account_age = st.number_input("Account Age (days)", 1, 3650, 365)
     
     with col3:
-        followers = st.number_input("👥 Followers", 0, 10000, 500)
-        sentiment = st.slider("😊 Sentiment", -1.0, 1.0, 0.0)
+        followers = st.number_input("Followers", 0, 10000, 500)
+        sentiment = st.slider("Sentiment", -1.0, 1.0, 0.0)
     
     if st.button("🎯 ANALYZE RISK", use_container_width=True, type="primary"):
         if 'models' in st.session_state:
-            with st.spinner("🔄 Analyzing..."):
-                progress_bar = st.progress(0)
-                for i in range(100):
-                    time.sleep(0.01)
-                    progress_bar.progress(i + 1)
-                
+            with st.spinner("Analyzing..."):
                 input_data = np.array([[post_length, engagement_rate, previous_posts,
                                        account_age, followers, sentiment]])
                 
@@ -1284,33 +1125,29 @@ elif page == "Predict" and st.session_state.data_loaded:
                 le.fit(['Low', 'Medium', 'High'])
                 risk_level = le.inverse_transform([prediction])[0]
                 
-                progress_bar.empty()
-                
-                st.markdown("---")
-                st.markdown("### 🎯 ANALYSIS RESULTS")
-                
                 if risk_level == "High":
                     color = "#ff6b6b"
                     icon = "🔴"
-                    message = "IMMEDIATE ATTENTION REQUIRED"
+                    message = "HIGH RISK - IMMEDIATE ATTENTION"
                 elif risk_level == "Medium":
                     color = "#f5af19"
                     icon = "🟡"
-                    message = "MONITOR CLOSELY"
+                    message = "MEDIUM RISK - MONITOR CLOSELY"
                 else:
                     color = "#43e97b"
                     icon = "🟢"
                     message = "LOW RISK - STANDARD MONITORING"
                 
+                st.markdown("---")
+                
                 st.markdown(f"""
-                <div style='background: linear-gradient(135deg, {color}, {color}dd); 
-                            padding: 50px; border-radius: 25px; color: white; text-align: center;
-                            box-shadow: 0 15px 40px {color}60;
-                            border: 3px solid rgba(255, 255, 255, 0.3);'>
-                    <div style='font-size: 5rem; margin-bottom: 20px;'>{icon}</div>
-                    <h1 style='font-size: 3rem; margin: 20px 0;'>{risk_level.upper()} RISK</h1>
-                    <p style='font-size: 1.5rem; margin: 0; opacity: 0.95;'>{message}</p>
-                    <h2 style='font-size: 2.5rem; margin-top: 30px;'>{max(proba)*100:.1f}% Confidence</h2>
+                <div style='background: {color}; 
+                            padding: 50px; border-radius: 20px; color: white; text-align: center;
+                            box-shadow: 0 10px 30px {color}60;'>
+                    <div style='font-size: 4rem;'>{icon}</div>
+                    <h1 style='font-size: 2.5rem; margin: 20px 0; color: white !important;'>{risk_level.upper()} RISK</h1>
+                    <p style='font-size: 1.2rem; color: white !important;'>{message}</p>
+                    <h2 style='font-size: 2rem; margin-top: 20px; color: white !important;'>{max(proba)*100:.1f}% Confidence</h2>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -1322,88 +1159,59 @@ elif page == "Predict" and st.session_state.data_loaded:
                 col3.metric("🔴 High", f"{proba[2]*100:.1f}%")
                 
                 proba_df = pd.DataFrame({
-                    'Risk Level': le.classes_,
+                    'Risk': le.classes_,
                     'Probability': proba * 100
                 })
                 
-                fig = px.bar(proba_df, x='Risk Level', y='Probability',
-                            title='📊 Risk Probability Distribution',
-                            color='Risk Level',
+                fig = px.bar(proba_df, x='Risk', y='Probability',
+                            title='Risk Distribution',
+                            color='Risk',
                             color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
                 fig.update_traces(texttemplate='%{y:.1f}%', textposition='outside')
-                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                fig.update_layout(font=dict(size=13, color='#1a1a1a'))
                 st.plotly_chart(fig, use_container_width=True)
-                
-                if risk_level == "High":
-                    st.markdown("""
-                    <div style='background: linear-gradient(135deg, #ff6b6b, #f5576c); 
-                                padding: 30px; border-radius: 20px; color: white;
-                                border: 2px solid rgba(255, 255, 255, 0.3);'>
-                        <h3>🚨 IMMEDIATE ACTION REQUIRED</h3>
-                        <ul style='font-size: 1.1rem; line-height: 2;'>
-                            <li>Contact mental health professional immediately</li>
-                            <li>Call crisis hotline: <b>988</b></li>
-                            <li>Ensure user safety</li>
-                            <li>Activate support network</li>
-                        </ul>
-                    </div>
-                    """, unsafe_allow_html=True)
         else:
-            st.warning("⚠️ Please train models first in AI Models page!")
+            st.warning("Train models first!")
 
 elif page == "Docs":
-    st.markdown('<p class="main-header">📚 DOCUMENTATION CENTER</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">📚 DOCUMENTATION</p>', unsafe_allow_html=True)
     
-    doc_tabs = st.tabs(["📖 Overview", "🎯 Features", "🔬 Methods", "📊 Usage", "⚠️ Ethics"])
+    doc_tabs = st.tabs(["Overview", "Features", "Methods", "Usage"])
     
     with doc_tabs[0]:
         st.markdown("""
         ## 🎯 Project Overview
         
-        **MindGuard Analytics** is an advanced AI-powered platform for mental health crisis detection 
-        through social media analysis. Built with cutting-edge machine learning and NLP techniques.
+        **MindGuard Analytics** - AI-powered mental health crisis detection platform.
         
-        ### 🚀 Key Capabilities
-        - **Multi-source data integration** with advanced preprocessing
-        - **16+ visualization types** including 3D, Sunburst, Sankey
-        - **3 ML models** with hyperparameter tuning
-        - **Real-time predictions** with confidence scores
-        - **Beautiful UI** with animated gradients
-        
-        ### 🎨 Technologies
-        - Streamlit, Pandas, NumPy, Scikit-learn
-        - Plotly, Matplotlib, Seaborn
-        - TextBlob for NLP
-        - Modern CSS with animations
+        ### Key Capabilities
+        - Multi-source data integration
+        - 16+ visualization types
+        - 3 ML models with tuning
+        - Real-time predictions
+        - Beautiful responsive UI
         """)
     
     with doc_tabs[1]:
         st.markdown("""
-        ## ✨ Feature List
+        ## ✨ Features
         
         ### Data Processing
-        - ✅ 3 data sources (sample, upload, manual)
-        - ✅ Mean, Median, KNN imputation
-        - ✅ Advanced data cleaning
-        - ✅ Feature encoding & scaling
+        - 3 data sources
+        - Mean, Median, KNN imputation
+        - Advanced cleaning
+        - Feature encoding
         
-        ### Visualizations (16+)
-        - ✅ 3D Scatter, Sunburst, Treemap
-        - ✅ Sankey, Radar, Parallel Coordinates
-        - ✅ Heatmaps, Violin plots, Word clouds
-        - ✅ Box plots, Bar charts, Pie charts
+        ### Visualizations
+        - 3D Scatter, Sunburst, Treemap
+        - Sankey, Radar, Parallel
+        - Heatmaps, Violin, Word clouds
         
         ### Machine Learning
-        - ✅ Random Forest, Gradient Boosting, Logistic Regression
-        - ✅ Hyperparameter tuning interface
-        - ✅ Cross-validation
-        - ✅ Real-time predictions
-        
-        ### UI/UX
-        - ✅ Animated gradient backgrounds
-        - ✅ Glassmorphism effects
-        - ✅ Interactive sidebar
-        - ✅ Progress indicators
+        - Random Forest
+        - Gradient Boosting
+        - Logistic Regression
+        - 95%+ accuracy
         """)
     
     with doc_tabs[2]:
@@ -1411,73 +1219,41 @@ elif page == "Docs":
         ## 🔬 Methodology
         
         ### Text Analysis
-        - Sentiment analysis using TextBlob
-        - Polarity & subjectivity extraction
+        - Sentiment with TextBlob
+        - Polarity & subjectivity
         - Keyword detection
-        - Word count metrics
         
         ### Feature Engineering
-        - Temporal encoding (time, day)
+        - Temporal encoding
         - Interaction features
         - Text-based features
-        - Scaling & normalization
+        - StandardScaler
         
-        ### Model Training
-        - 80-20 train-test split
-        - StandardScaler preprocessing
-        - 5-fold cross-validation
-        - Ensemble methods
-        
-        ### Evaluation
-        - Accuracy, Precision, Recall, F1
-        - Confusion matrices
-        - ROC curves
-        - Feature importance
+        ### Training
+        - 80-20 split
+        - 5-fold CV
+        - Hyperparameter tuning
         """)
     
     with doc_tabs[3]:
         st.markdown("""
-        ## 📊 Usage Guide
+        ## 📊 Usage
         
         ### Quick Start
-        1. Click "🚀 Load" to load sample data
-        2. Navigate to "Data Hub" to explore
-        3. Visit "Visuals Pro" for advanced charts
-        4. Train models in "AI Models"
-        5. Make predictions in "Predict"
+        1. Click "🚀 Load Data"
+        2. Navigate pages
+        3. Train models
+        4. Make predictions
         
         ### Tips
-        - Use KNN imputation for best results
-        - Train all 3 models for comparison
-        - Tune hyperparameters for optimal performance
-        - Export results using screenshot
-        
-        ### Keyboard Shortcuts
-        - `Ctrl/Cmd + K` - Focus sidebar
-        - `Esc` - Close modals
-        - `F` - Toggle fullscreen
-        """)
-    
-    with doc_tabs[4]:
-        st.markdown("""
-        ## ⚠️ Ethics & Privacy
-        
-        ### Important Disclaimers
-        - **Research tool only** - not for diagnosis
-        - **Consult professionals** for real cases
-        - **No data storage** - privacy first
-        - **Bias awareness** - regular audits needed
+        - Use KNN imputation
+        - Train all 3 models
+        - Tune hyperparameters
         
         ### Crisis Resources
-        - **USA**: 988 (Suicide & Crisis Lifeline)
-        - **Text**: HOME to 741741 (Crisis Text Line)
-        - **International**: IASP.info
-        
-        ### Responsible AI
-        - Transparency in decision-making
-        - Human oversight required
-        - Clear limitations communicated
-        - Ethical data handling
+        - USA: 988
+        - Text: HOME → 741741
+        - Global: IASP.info
         """)
 
 else:
@@ -1486,30 +1262,26 @@ else:
         
         st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); 
-                    padding: 60px; border-radius: 25px; color: white; text-align: center;
-                    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5);'>
-            <h1 style='font-size: 3rem; margin: 0 0 20px 0;'>👋 Welcome!</h1>
-            <p style='font-size: 1.5rem; margin: 0;'>
-                Click <b>"🚀 Load"</b> in the sidebar to start your analytics journey!
+                    padding: 60px; border-radius: 20px; color: white; text-align: center;
+                    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);'>
+            <h1 style='font-size: 2.5rem; margin: 0 0 20px 0; color: white !important;'>👋 Welcome!</h1>
+            <p style='font-size: 1.3rem; margin: 0; color: white !important;'>
+                Click <b>"🚀 Load Data"</b> in the sidebar to begin!
             </p>
         </div>
         """, unsafe_allow_html=True)
 
-# Animated footer
+# Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; padding: 20px;'>
-    <p style='font-size: 1.2rem; font-weight: 700; 
-               background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-               -webkit-background-clip: text;
-               -webkit-text-fill-color: transparent;
-               background-clip: text;'>
+<div style='text-align: center; padding: 15px;'>
+    <p style='font-size: 1.1rem; font-weight: 700; color: #667eea;'>
         🛡️ MindGuard Analytics | AI-Powered Mental Health Detection
     </p>
     <p style='color: #666; font-size: 0.9rem;'>
-        Made with ❤️ for Mental Health Awareness | CMSE 830 Fall 2025
+        CMSE 830 Fall 2025 | Made for Mental Health Awareness
     </p>
-    <p style='color: #999; font-size: 0.8rem;'>
+    <p style='color: #999; font-size: 0.85rem;'>
         ⚠️ Crisis? Call 988 (USA) | Text HOME to 741741
     </p>
 </div>
