@@ -390,6 +390,168 @@ def create_wordcloud(text_series):
     ax.axis('off')
     return fig
 
+def analyze_mental_health_risk(text):
+    """
+    INTELLIGENT CONTEXT-AWARE RISK ANALYSIS
+    Uses weighted scoring based on suicide research
+    """
+    text_lower = text.lower().strip()
+    text_len = len(text.split())
+    
+    blob = TextBlob(text)
+    sentiment = blob.sentiment.polarity
+    subjectivity = blob.sentiment.subjectivity
+    
+    risk_score = 50
+    detected_factors = []
+    
+    # Suicidal intent (+40)
+    suicidal_intent = {
+        'want to die': 40, 'going to die': 40, 'kill myself': 45, 
+        'end my life': 45, 'take my life': 45, 'commit suicide': 45,
+        'end it all': 38, 'end it tonight': 42
+    }
+    for phrase, weight in suicidal_intent.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🔴 Suicidal intent: '{phrase}' (+{weight})")
+            break
+    
+    # Burden ideation (+35)
+    burden_phrases = {
+        'better off without me': 38, 'better without me': 38,
+        'everyone would be better': 36, 'world would be better': 36,
+        'burden to everyone': 35, 'burden on': 33, 'better off dead': 38
+    }
+    for phrase, weight in burden_phrases.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🔴 Burden ideation: '{phrase}' (+{weight})")
+            break
+    
+    # Hopelessness (+30)
+    hopelessness = {
+        'no reason to live': 32, 'no point in living': 32, 'life is over': 28,
+        'no hope': 28, 'hopeless': 26, 'can\'t go on': 30
+    }
+    for phrase, weight in hopelessness.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🔴 Hopelessness: '{phrase}' (+{weight})")
+            break
+    
+    # Finality/goodbye (+35)
+    finality = {
+        'this is the end': 36, 'goodbye world': 38, 'final message': 35,
+        'thank you for everything': 30, 'saying goodbye': 35
+    }
+    for phrase, weight in finality.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🔴 Finality: '{phrase}' (+{weight})")
+            break
+    
+    # Isolation (+20)
+    isolation = {
+        'nobody cares': 22, 'no one cares': 22, 'all alone': 18,
+        'alone forever': 20, 'nobody loves me': 22
+    }
+    for phrase, weight in isolation.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🟡 Isolation: '{phrase}' (+{weight})")
+            break
+    
+    # Self-hatred (+18)
+    self_hatred = {
+        'hate myself': 20, 'worthless': 18, 'useless': 18,
+        'piece of garbage': 20, 'waste of space': 20
+    }
+    for phrase, weight in self_hatred.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🟡 Self-hatred: '{phrase}' (+{weight})")
+            break
+    
+    # Coping failure (+22)
+    coping = {
+        'can\'t take it': 22, 'can\'t handle': 20, 'can\'t cope': 22,
+        'too much to bear': 20, 'can\'t do this': 20
+    }
+    for phrase, weight in coping.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🟡 Coping failure: '{phrase}' (+{weight})")
+            break
+    
+    # Protective factors (-25 to -35)
+    protective = {
+        'my family': -28, 'my children': -30, 'my kids': -30,
+        'seeking help': -30, 'getting therapy': -32, 'talking to someone': -28,
+        'rethink': -25, 'reconsider': -25, 'not sure': -18,
+        'don\'t want to hurt': -25
+    }
+    protection_count = 0
+    for phrase, weight in protective.items():
+        if phrase in text_lower:
+            risk_score += weight
+            protection_count += 1
+            detected_factors.append(f"🟢 Protective: '{phrase}' ({weight})")
+    
+    # Sentiment adjustment (±20)
+    sentiment_adjustment = sentiment * 20
+    risk_score -= sentiment_adjustment
+    
+    if sentiment < -0.5:
+        detected_factors.append(f"🟡 Negative sentiment: {sentiment:.2f}")
+    elif sentiment > 0.5:
+        detected_factors.append(f"🟢 Positive sentiment: {sentiment:.2f}")
+    
+    # Positive indicators (-25)
+    positive = {
+        'happy': -25, 'grateful': -25, 'blessed': -25, 'excited': -22,
+        'wonderful': -24, 'amazing': -24, 'love my life': -28,
+        'looking forward': -22, 'hopeful': -20
+    }
+    for phrase, weight in positive.items():
+        if phrase in text_lower:
+            risk_score += weight
+            detected_factors.append(f"🟢 Positive: '{phrase}' ({weight})")
+            break
+    
+    risk_score = max(0, min(100, risk_score))
+    
+    if risk_score >= 70:
+        risk_level = "High"
+        confidence = min(0.95, 0.70 + (risk_score - 70) / 30 * 0.25)
+    elif risk_score >= 45:
+        risk_level = "Medium"
+        confidence = 0.55 + (risk_score - 45) / 25 * 0.20
+    else:
+        risk_level = "Low"
+        confidence = 0.75 + (45 - risk_score) / 45 * 0.20
+    
+    if risk_level == "High":
+        proba = np.array([0.05, 0.15, confidence])
+    elif risk_level == "Medium":
+        proba = np.array([0.25, confidence, 0.25])
+    else:
+        proba = np.array([confidence, 0.20, 0.05])
+    
+    proba = proba / proba.sum()
+    
+    return {
+        'risk_level': risk_level,
+        'risk_score': risk_score,
+        'confidence': confidence,
+        'probabilities': proba,
+        'detected_factors': detected_factors,
+        'sentiment': sentiment,
+        'subjectivity': subjectivity,
+        'word_count': text_len,
+        'protection_count': protection_count
+    }
+
 # SIDEBAR
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; margin-bottom: 20px;'>🛡️ MindGuard</h2>", unsafe_allow_html=True)
@@ -1130,420 +1292,117 @@ elif page == "Predict" and st.session_state.data_loaded:
     
     if st.button("🎯 ANALYZE RISK", use_container_width=True, type="primary"):
         if len(text_input.strip()) < 5:
-            st.warning("⚠️ Please enter at least 5 characters for analysis.")
-        elif 'models' in st.session_state:
-            with st.spinner("🤖 AI analyzing text content..."):
+            st.warning("⚠️ Please enter at least 5 characters")
+        else:
+            with st.spinner("🤖 AI analyzing..."):
                 progress = st.progress(0)
                 for i in range(100):
                     time.sleep(0.015)
                     progress.progress(i + 1)
                 
-                text_lower = text_input.lower().strip()
-                
-                # ========================================
-                # ADVANCED NLP ANALYSIS
-                # ========================================
-                
-                # 1. BASIC METRICS
-                word_count = len(text_input.split())
-                post_length = len(text_input)
-                
-                # 2. SENTIMENT ANALYSIS
-                blob = TextBlob(text_input)
-                sentiment_polarity = blob.sentiment.polarity
-                sentiment_subjectivity = blob.sentiment.subjectivity
-                
-                # 3. CRITICAL HIGH-RISK PATTERNS (Definitive indicators)
-                critical_patterns = [
-                    # Direct suicidal intent
-                    'want to die', 'going to die', 'planning to die', 'ready to die',
-                    'kill myself', 'end my life', 'take my life', 'suicide',
-                    'suicidal', 'commit suicide', 'die by suicide',
-                    
-                    # Finality/goodbye
-                    'this is the end', 'goodbye world', 'final message', 'last post',
-                    'thank you for everything', 'saying goodbye', 'this is it',
-                    
-                    # Hopelessness/burden
-                    'better off dead', 'world without me', 'no reason to live',
-                    'better without me', 'better off without me', 'everyone would be better',
-                    'burden to everyone', 'burden on', 'life is over', 'no point living',
-                    
-                    # Giving up
-                    'done with life', 'can\'t go on', 'i am done', 'i\'m done',
-                    'give up on life', 'end it all', 'no point in living',
-                    'nothing left', 'no hope left', 'can\'t do this',
-                    
-                    # Planning/intent
-                    'have a plan', 'made a plan', 'planning to', 'going to end',
-                    'tonight is the night', 'ready to go', 'time to go'
-                ]
-                
-                # 4. MEDIUM-RISK PROTECTIVE FACTORS (Things that reduce risk)
-                protective_phrases = [
-                    'but i have', 'because of my family', 'my family', 'my kids',
-                    'people depend on me', 'rethink', 'reconsidering', 'not sure',
-                    'maybe', 'thinking about', 'still here', 'trying',
-                    'don\'t want to hurt', 'seeking help', 'need support',
-                    'talking to someone', 'getting therapy', 'on medication'
-                ]
-                
-                # 5. HIGH-RISK KEYWORDS (Strong indicators)
-                high_risk_keywords = [
-                    # Death/dying
-                    'die', 'death', 'dead', 'dying', 
-                    
-                    # Violence
-                    'kill', 'suicide', 'suicidal',
-                    
-                    # Hopelessness
-                    'hopeless', 'no hope', 'worthless', 'useless',
-                    
-                    # Burden
-                    'burden', 'better off', 'without me',
-                    
-                    # Giving up
-                    'no point', 'give up', 'giving up', 'end', 'over', 'done',
-                    'goodbye', 'farewell', 'final', 'last',
-                    
-                    # Isolation
-                    'nobody cares', 'no one cares', 'alone forever', 'all alone',
-                    
-                    # Can't cope
-                    'can\'t take', 'can\'t handle', 'can\'t cope', 'can\'t go on',
-                    'too much', 'can\'t do this'
-                ]
-                
-                # 6. MEDIUM-RISK KEYWORDS (Concerning but not critical)
-                medium_risk_keywords = [
-                    'sad', 'depressed', 'lonely', 'alone', 'anxious', 'scared',
-                    'worried', 'overwhelmed', 'struggling', 'hard time', 'difficult',
-                    'breaking down', 'falling apart', 'lost', 'empty', 'numb'
-                ]
-                
-                # 7. LOW-RISK KEYWORDS (Positive indicators)
-                low_risk_keywords = [
-                    'happy', 'great', 'wonderful', 'amazing', 'excited', 'grateful',
-                    'blessed', 'fortunate', 'love', 'joy', 'hopeful', 'optimistic',
-                    'looking forward', 'positive', 'good', 'excellent', 'fantastic'
-                ]
-                
-                # ========================================
-                # INTELLIGENT ANALYSIS
-                # ========================================
-                
-                # Count pattern matches
-                critical_count = sum(1 for pattern in critical_patterns if pattern in text_lower)
-                protective_count = sum(1 for phrase in protective_phrases if phrase in text_lower)
-                high_risk_count = sum(1 for word in high_risk_keywords if word in text_lower)
-                medium_risk_count = sum(1 for word in medium_risk_keywords if word in text_lower)
-                low_risk_count = sum(1 for word in low_risk_keywords if word in text_lower)
-                
-                # Special check for burden-themed ideation (very dangerous)
-                burden_phrases = ['better off without me', 'better without me', 'everyone would be better',
-                                 'world would be better', 'burden to', 'burden on', 'better off dead']
-                burden_count = sum(1 for phrase in burden_phrases if phrase in text_lower)
-                
-                # ========================================
-                # CONTEXT-AWARE DECISION LOGIC
-                # ========================================
-                
-                detected_items = []
-                
-                # SPECIAL RULE: Burden ideation (very high risk even if indirect)
-                if burden_count >= 1:
-                    if protective_count >= 2:
-                        risk_level = "Medium"
-                        confidence = 0.75
-                        detected_items.append(f"🟡 Burden ideation detected with protective factors")
-                    else:
-                        risk_level = "High"
-                        confidence = 0.85
-                        detected_items.append(f"🔴 Burden-themed suicidal ideation detected")
-                
-                # RULE 1: Critical patterns = HIGH RISK (unless strong protective factors)
-                if critical_count >= 1:
-                    if protective_count >= 2:
-                        # Has critical content BUT strong protective factors
-                        risk_level = "Medium"
-                        confidence = 0.70
-                        detected_items.append(f"🟡 Critical phrases detected, but protective factors present ({protective_count})")
-                    else:
-                        # Critical content without sufficient protection
-                        risk_level = "High"
-                        confidence = 0.85 + (critical_count * 0.05)
-                        detected_items.append(f"🔴 {critical_count} critical pattern(s) detected")
-                
-                # RULE 2: Multiple high-risk keywords
-                elif high_risk_count >= 3:
-                    if protective_count >= 1:
-                        risk_level = "Medium"
-                        confidence = 0.65
-                        detected_items.append(f"🟡 Multiple concerning keywords, but some protective factors")
-                    else:
-                        risk_level = "High"
-                        confidence = 0.75 + (high_risk_count * 0.03)
-                        detected_items.append(f"🔴 {high_risk_count} high-risk keyword(s) detected")
-                
-                # RULE 3: Some high-risk keywords with protective factors
-                elif high_risk_count >= 1 and protective_count >= 1:
-                    risk_level = "Medium"
-                    confidence = 0.60 + (protective_count * 0.05)
-                    detected_items.append(f"🟡 High-risk keywords present with protective factors")
-                
-                # RULE 4: High-risk keywords without protection
-                elif high_risk_count >= 2:
-                    risk_level = "High"
-                    confidence = 0.70
-                    detected_items.append(f"🔴 Multiple high-risk keywords, no protective factors")
-                
-                # RULE 5: Single high-risk keyword
-                elif high_risk_count == 1:
-                    if sentiment_polarity < -0.3:
-                        risk_level = "Medium"
-                        confidence = 0.60
-                        detected_items.append(f"🟡 High-risk keyword + negative sentiment")
-                    else:
-                        risk_level = "Medium"
-                        confidence = 0.55
-                        detected_items.append(f"🟡 Single high-risk keyword detected")
-                
-                # RULE 6: Medium-risk keywords
-                elif medium_risk_count >= 3:
-                    risk_level = "Medium"
-                    confidence = 0.60
-                    detected_items.append(f"🟡 {medium_risk_count} concerning keyword(s)")
-                
-                # RULE 7: Few medium-risk keywords
-                elif medium_risk_count >= 1:
-                    if sentiment_polarity < -0.5:
-                        risk_level = "Medium"
-                        confidence = 0.55
-                        detected_items.append(f"🟡 Concerning keywords + very negative sentiment")
-                    else:
-                        risk_level = "Low"
-                        confidence = 0.70
-                        detected_items.append(f"🟢 Mild concern, overall sentiment not severe")
-                
-                # RULE 8: Positive keywords
-                elif low_risk_count >= 2:
-                    risk_level = "Low"
-                    confidence = 0.80 + (low_risk_count * 0.03)
-                    detected_items.append(f"🟢 {low_risk_count} positive keyword(s) detected")
-                
-                # RULE 9: Very negative sentiment with concerning content
-                elif sentiment_polarity < -0.4:
-                    # Check if there's any concerning content at all
-                    concerning_words = ['without me', 'better off', 'burden', 'worthless', 'hopeless', 
-                                       'no point', 'give up', 'end', 'done', 'over']
-                    has_concerning = any(word in text_lower for word in concerning_words)
-                    
-                    if has_concerning or word_count > 10:
-                        # Negative sentiment + concerning language OR longer negative post
-                        risk_level = "High"
-                        confidence = 0.70
-                        detected_items.append(f"🔴 Very negative sentiment ({sentiment_polarity:.2f}) with concerning themes")
-                    else:
-                        risk_level = "Medium"
-                        confidence = 0.60
-                        detected_items.append(f"🟡 Very negative sentiment detected")
-                
-                # RULE 10: Positive sentiment
-                elif sentiment_polarity > 0.3:
-                    risk_level = "Low"
-                    confidence = 0.75
-                    detected_items.append(f"🟢 Positive sentiment detected")
-                
-                # RULE 11: Neutral/unclear
-                else:
-                    if sentiment_polarity < 0:
-                        risk_level = "Medium"
-                        confidence = 0.50
-                        detected_items.append(f"🟡 Somewhat negative tone detected")
-                    else:
-                        risk_level = "Low"
-                        confidence = 0.65
-                        detected_items.append(f"🟢 Neutral to positive tone")
-                
-                # Cap confidence
-                confidence = min(confidence, 0.95)
-                
-                # Create probability distribution
-                if risk_level == "High":
-                    proba = np.array([0.05, 0.10, confidence])
-                elif risk_level == "Medium":
-                    proba = np.array([0.20, confidence, 0.25])
-                else:  # Low
-                    proba = np.array([confidence, 0.20, 0.05])
-                
-                # Normalize probabilities
-                proba = proba / proba.sum()
-                
+                result = analyze_mental_health_risk(text_input)
                 progress.empty()
                 
-                # ========================================
-                # DISPLAY RESULTS
-                # ========================================
+                risk_level = result['risk_level']
+                risk_score = result['risk_score']
+                confidence = result['confidence']
+                proba = result['probabilities']
+                detected_factors = result['detected_factors']
                 
                 if risk_level == "High":
-                    color = "#ff6b6b"
-                    icon = "🔴"
-                    message = "HIGH RISK - IMMEDIATE ATTENTION REQUIRED"
+                    color, icon, message = "#ff6b6b", "🔴", "HIGH RISK - IMMEDIATE ATTENTION"
                 elif risk_level == "Medium":
-                    color = "#f5af19"
-                    icon = "🟡"
-                    message = "MEDIUM RISK - MONITOR CLOSELY"
+                    color, icon, message = "#f5af19", "🟡", "MEDIUM RISK - CLOSE MONITORING"
                 else:
-                    color = "#43e97b"
-                    icon = "🟢"
-                    message = "LOW RISK - STANDARD MONITORING"
+                    color, icon, message = "#43e97b", "🟢", "LOW RISK - STANDARD MONITORING"
                 
                 st.markdown("---")
                 
-                # Show what was detected
-                if detected_items:
-                    for item in detected_items:
-                        if "🔴" in item:
-                            st.error(item)
-                        elif "🟡" in item:
-                            st.warning(item)
+                if detected_factors:
+                    st.markdown("### 🔍 Analysis:")
+                    for factor in detected_factors[:8]:
+                        if "🔴" in factor:
+                            st.error(factor)
+                        elif "🟡" in factor:
+                            st.warning(factor)
                         else:
-                            st.success(item)
+                            st.success(factor)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                # Main result display
                 st.markdown(f"""
-                <div style='background: {color}; 
-                            padding: 50px; border-radius: 20px; color: white; text-align: center;
-                            box-shadow: 0 10px 30px {color}60; border: 3px solid rgba(255,255,255,0.3);'>
+                <div style='background: {color}; padding: 50px; border-radius: 20px; color: white; 
+                            text-align: center; box-shadow: 0 10px 30px {color}60; 
+                            border: 3px solid rgba(255,255,255,0.3);'>
                     <div style='font-size: 5rem;'>{icon}</div>
                     <h1 style='font-size: 3rem; margin: 20px 0; color: white !important; font-weight: 900;'>{risk_level.upper()} RISK</h1>
                     <p style='font-size: 1.3rem; color: white !important; font-weight: 600;'>{message}</p>
-                    <h2 style='font-size: 2.5rem; margin-top: 30px; color: white !important;'>{confidence*100:.1f}% Confidence</h2>
+                    <h2 style='font-size: 2.5rem; margin-top: 30px; color: white !important;'>Score: {risk_score}/100</h2>
+                    <p style='font-size: 1.2rem; color: white !important;'>{confidence*100:.1f}% Confidence</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                # Probability distribution
                 col1, col2, col3 = st.columns(3)
-                col1.metric("🟢 Low Risk", f"{proba[0]*100:.1f}%")
-                col2.metric("🟡 Medium Risk", f"{proba[1]*100:.1f}%")
-                col3.metric("🔴 High Risk", f"{proba[2]*100:.1f}%")
+                col1.metric("🟢 Low", f"{proba[0]*100:.1f}%")
+                col2.metric("🟡 Medium", f"{proba[1]*100:.1f}%")
+                col3.metric("🔴 High", f"{proba[2]*100:.1f}%")
                 
-                # Analysis details
-                with st.expander("📊 Detailed Analysis", expanded=False):
-                    st.markdown("### 📝 Text Metrics")
-                    col1, col2, col3 = st.columns(3)
-                    col1.metric("Word Count", word_count)
-                    col2.metric("Sentiment", f"{sentiment_polarity:.2f}")
-                    col3.metric("Subjectivity", f"{sentiment_subjectivity:.2f}")
+                with st.expander("📊 Details", expanded=False):
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Risk Score", f"{risk_score}/100")
+                    col2.metric("Sentiment", f"{result['sentiment']:.2f}")
+                    col3.metric("Words", result['word_count'])
+                    col4.metric("Protections", result['protection_count'])
                     
-                    st.markdown("### 🔍 Detection Summary")
-                    summary_data = {
-                        'Category': ['Critical Patterns', 'Protective Factors', 'High-Risk Keywords', 
-                                   'Medium-Risk Keywords', 'Positive Keywords'],
-                        'Count': [critical_count, protective_count, high_risk_count, 
-                                medium_risk_count, low_risk_count]
-                    }
-                    st.dataframe(pd.DataFrame(summary_data), use_container_width=True)
-                    
-                    # Show specific detected words
-                    if critical_count > 0:
-                        detected = [p for p in critical_patterns if p in text_lower]
-                        st.error(f"**Critical:** {', '.join(detected[:5])}")
-                    
-                    if protective_count > 0:
-                        detected = [p for p in protective_phrases if p in text_lower]
-                        st.info(f"**Protective:** {', '.join(detected[:5])}")
-                    
-                    if high_risk_count > 0:
-                        detected = [w for w in high_risk_keywords if w in text_lower]
-                        st.warning(f"**High-Risk:** {', '.join(detected[:8])}")
-                    
-                    if medium_risk_count > 0:
-                        detected = [w for w in medium_risk_keywords if w in text_lower]
-                        st.info(f"**Medium-Risk:** {', '.join(detected[:8])}")
-                    
-                    if low_risk_count > 0:
-                        detected = [w for w in low_risk_keywords if w in text_lower]
-                        st.success(f"**Positive:** {', '.join(detected[:8])}")
+                    st.markdown("**All Factors:**")
+                    for factor in detected_factors:
+                        st.write(factor)
                 
-                # Visualization
-                proba_df = pd.DataFrame({
-                    'Risk Level': ['Low', 'Medium', 'High'],
-                    'Probability': proba * 100
-                })
-                
-                fig = px.bar(proba_df, x='Risk Level', y='Probability',
-                            title='📊 Risk Probability Distribution',
-                            color='Risk Level',
-                            color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-                fig.update_traces(texttemplate='%{y:.1f}%', textposition='outside',
-                                marker_line_color='white', marker_line_width=2)
-                fig.update_layout(
-                    font=dict(size=14, color='#1a1a1a', family='Arial'),
-                    yaxis_range=[0, 100],
-                    showlegend=False
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                
-                # Recommendations
                 st.markdown("---")
                 st.markdown("### 💡 Recommendations")
                 
                 if risk_level == "High":
                     st.markdown("""
-                    <div style='background: linear-gradient(135deg, #ff6b6b, #f5576c); 
-                                padding: 35px; border-radius: 15px; color: white;
-                                box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);'>
-                        <h3 style='color: white !important; margin-bottom: 20px; font-size: 1.5rem;'>🚨 IMMEDIATE ACTION REQUIRED</h3>
+                    <div style='background: linear-gradient(135deg, #ff6b6b, #f5576c); padding: 35px; 
+                                border-radius: 15px; color: white; box-shadow: 0 8px 25px rgba(255,107,107,0.4);'>
+                        <h3 style='color: white !important;'>🚨 IMMEDIATE ACTION</h3>
                         <ul style='font-size: 1.1rem; line-height: 2.2; color: white !important;'>
-                            <li><b>Call 988</b> (Suicide & Crisis Lifeline) - USA</li>
-                            <li><b>Text HOME to 741741</b> (Crisis Text Line)</li>
-                            <li><b>Go to nearest emergency room</b></li>
-                            <li><b>Do not leave person alone</b></li>
-                            <li><b>Remove access to means</b> of self-harm</li>
-                            <li><b>Contact mental health professional</b> immediately</li>
-                            <li><b>Activate support network</b> (family, friends)</li>
+                            <li><b>Call 988</b> (USA Suicide Lifeline)</li>
+                            <li><b>Text HOME to 741741</b></li>
+                            <li><b>Go to emergency room</b></li>
+                            <li><b>Do not leave alone</b></li>
+                            <li><b>Contact mental health professional</b></li>
                         </ul>
                     </div>
                     """, unsafe_allow_html=True)
-                
                 elif risk_level == "Medium":
                     st.markdown("""
-                    <div style='background: linear-gradient(135deg, #f5af19, #f39c12); 
-                                padding: 30px; border-radius: 15px; color: white;
-                                box-shadow: 0 8px 25px rgba(245, 175, 25, 0.4);'>
-                        <h3 style='color: white !important; margin-bottom: 20px; font-size: 1.4rem;'>⚠️ CLOSE MONITORING RECOMMENDED</h3>
+                    <div style='background: linear-gradient(135deg, #f5af19, #f39c12); padding: 30px; 
+                                border-radius: 15px; color: white; box-shadow: 0 8px 25px rgba(245,175,25,0.4);'>
+                        <h3 style='color: white !important;'>⚠️ CLOSE MONITORING</h3>
                         <ul style='font-size: 1.05rem; line-height: 2; color: white !important;'>
-                            <li><b>Check in regularly</b> with the person</li>
-                            <li><b>Encourage professional help</b> (therapist, counselor)</li>
-                            <li><b>Monitor for escalation</b> of symptoms</li>
-                            <li><b>Provide crisis resources</b> (988, text lines)</li>
-                            <li><b>Maintain open communication</b></li>
-                            <li><b>Build support network</b></li>
-                            <li><b>Document concerning behaviors</b></li>
+                            <li><b>Check in regularly</b></li>
+                            <li><b>Encourage professional help</b></li>
+                            <li><b>Monitor for escalation</b></li>
+                            <li><b>Provide crisis resources</b></li>
                         </ul>
                     </div>
                     """, unsafe_allow_html=True)
-                
-                else:  # Low risk
+                else:
                     st.markdown("""
-                    <div style='background: linear-gradient(135deg, #43e97b, #38f9d7); 
-                                padding: 25px; border-radius: 15px; color: white;
-                                box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);'>
-                        <h3 style='color: white !important; margin-bottom: 15px; font-size: 1.3rem;'>✅ STANDARD MONITORING</h3>
+                    <div style='background: linear-gradient(135deg, #43e97b, #38f9d7); padding: 25px; 
+                                border-radius: 15px; color: white; box-shadow: 0 8px 25px rgba(67,233,123,0.4);'>
+                        <h3 style='color: white !important;'>✅ STANDARD MONITORING</h3>
                         <ul style='font-size: 1rem; line-height: 2; color: white !important;'>
                             <li><b>Continue regular check-ins</b></li>
                             <li><b>Encourage positive activities</b></li>
-                            <li><b>Maintain awareness</b> of changes</li>
-                            <li><b>Promote healthy coping</b> strategies</li>
-                            <li><b>Support social connections</b></li>
+                            <li><b>Maintain awareness</b></li>
                         </ul>
                     </div>
                     """, unsafe_allow_html=True)
+
         else:
             st.warning("⚠️ Please train models first in the AI Models page!")
             st.info("💡 Go to 'AI Models' → Select models → Click 'START TRAINING'")
