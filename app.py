@@ -1155,13 +1155,28 @@ elif page == "Predict" and st.session_state.data_loaded:
                 
                 # 3. CRITICAL HIGH-RISK PATTERNS (Definitive indicators)
                 critical_patterns = [
+                    # Direct suicidal intent
                     'want to die', 'going to die', 'planning to die', 'ready to die',
                     'kill myself', 'end my life', 'take my life', 'suicide',
+                    'suicidal', 'commit suicide', 'die by suicide',
+                    
+                    # Finality/goodbye
                     'this is the end', 'goodbye world', 'final message', 'last post',
-                    'thank you for everything', 'done with life', 'can\'t go on',
+                    'thank you for everything', 'saying goodbye', 'this is it',
+                    
+                    # Hopelessness/burden
                     'better off dead', 'world without me', 'no reason to live',
-                    'have a plan', 'saying goodbye', 'this is it', 'end it all',
-                    'no point living', 'life is over', 'i am done', 'i\'m done'
+                    'better without me', 'better off without me', 'everyone would be better',
+                    'burden to everyone', 'burden on', 'life is over', 'no point living',
+                    
+                    # Giving up
+                    'done with life', 'can\'t go on', 'i am done', 'i\'m done',
+                    'give up on life', 'end it all', 'no point in living',
+                    'nothing left', 'no hope left', 'can\'t do this',
+                    
+                    # Planning/intent
+                    'have a plan', 'made a plan', 'planning to', 'going to end',
+                    'tonight is the night', 'ready to go', 'time to go'
                 ]
                 
                 # 4. MEDIUM-RISK PROTECTIVE FACTORS (Things that reduce risk)
@@ -1175,9 +1190,28 @@ elif page == "Predict" and st.session_state.data_loaded:
                 
                 # 5. HIGH-RISK KEYWORDS (Strong indicators)
                 high_risk_keywords = [
-                    'die', 'death', 'kill', 'suicide', 'hopeless', 'worthless',
-                    'no point', 'give up', 'end', 'over', 'done', 'goodbye',
-                    'final', 'last', 'nobody cares', 'alone forever', 'can\'t take'
+                    # Death/dying
+                    'die', 'death', 'dead', 'dying', 
+                    
+                    # Violence
+                    'kill', 'suicide', 'suicidal',
+                    
+                    # Hopelessness
+                    'hopeless', 'no hope', 'worthless', 'useless',
+                    
+                    # Burden
+                    'burden', 'better off', 'without me',
+                    
+                    # Giving up
+                    'no point', 'give up', 'giving up', 'end', 'over', 'done',
+                    'goodbye', 'farewell', 'final', 'last',
+                    
+                    # Isolation
+                    'nobody cares', 'no one cares', 'alone forever', 'all alone',
+                    
+                    # Can't cope
+                    'can\'t take', 'can\'t handle', 'can\'t cope', 'can\'t go on',
+                    'too much', 'can\'t do this'
                 ]
                 
                 # 6. MEDIUM-RISK KEYWORDS (Concerning but not critical)
@@ -1205,11 +1239,27 @@ elif page == "Predict" and st.session_state.data_loaded:
                 medium_risk_count = sum(1 for word in medium_risk_keywords if word in text_lower)
                 low_risk_count = sum(1 for word in low_risk_keywords if word in text_lower)
                 
+                # Special check for burden-themed ideation (very dangerous)
+                burden_phrases = ['better off without me', 'better without me', 'everyone would be better',
+                                 'world would be better', 'burden to', 'burden on', 'better off dead']
+                burden_count = sum(1 for phrase in burden_phrases if phrase in text_lower)
+                
                 # ========================================
                 # CONTEXT-AWARE DECISION LOGIC
                 # ========================================
                 
                 detected_items = []
+                
+                # SPECIAL RULE: Burden ideation (very high risk even if indirect)
+                if burden_count >= 1:
+                    if protective_count >= 2:
+                        risk_level = "Medium"
+                        confidence = 0.75
+                        detected_items.append(f"🟡 Burden ideation detected with protective factors")
+                    else:
+                        risk_level = "High"
+                        confidence = 0.85
+                        detected_items.append(f"🔴 Burden-themed suicidal ideation detected")
                 
                 # RULE 1: Critical patterns = HIGH RISK (unless strong protective factors)
                 if critical_count >= 1:
@@ -1281,11 +1331,22 @@ elif page == "Predict" and st.session_state.data_loaded:
                     confidence = 0.80 + (low_risk_count * 0.03)
                     detected_items.append(f"🟢 {low_risk_count} positive keyword(s) detected")
                 
-                # RULE 9: Very negative sentiment
-                elif sentiment_polarity < -0.6:
-                    risk_level = "Medium"
-                    confidence = 0.60
-                    detected_items.append(f"🟡 Very negative sentiment detected")
+                # RULE 9: Very negative sentiment with concerning content
+                elif sentiment_polarity < -0.4:
+                    # Check if there's any concerning content at all
+                    concerning_words = ['without me', 'better off', 'burden', 'worthless', 'hopeless', 
+                                       'no point', 'give up', 'end', 'done', 'over']
+                    has_concerning = any(word in text_lower for word in concerning_words)
+                    
+                    if has_concerning or word_count > 10:
+                        # Negative sentiment + concerning language OR longer negative post
+                        risk_level = "High"
+                        confidence = 0.70
+                        detected_items.append(f"🔴 Very negative sentiment ({sentiment_polarity:.2f}) with concerning themes")
+                    else:
+                        risk_level = "Medium"
+                        confidence = 0.60
+                        detected_items.append(f"🟡 Very negative sentiment detected")
                 
                 # RULE 10: Positive sentiment
                 elif sentiment_polarity > 0.3:
