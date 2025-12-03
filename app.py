@@ -907,25 +907,42 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
         source = [labels.index(x) for x in flow_data['time_of_day']]
         target = [labels.index(x) for x in flow_data['risk_level']]
         
+        # Transparent link colors
         link_colors = []
         for risk in flow_data['risk_level']:
             if risk == 'High':
-                link_colors.append('rgba(255, 107, 107, 0.4)')
+                link_colors.append('rgba(255, 107, 107, 0.3)')
             elif risk == 'Medium':
-                link_colors.append('rgba(245, 175, 25, 0.4)')
+                link_colors.append('rgba(245, 175, 25, 0.3)')
             else:
-                link_colors.append('rgba(67, 233, 123, 0.4)')
+                link_colors.append('rgba(67, 233, 123, 0.3)')
         
-        node_colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b', '#f5af19', '#ff6b6b']
+        # Light pastel colors for nodes so text is visible
+        node_colors = ['#e3f2fd', '#f3e5f5', '#fff3e0', '#e8f5e9',  # Time of day - light pastels
+                      '#c8e6c9', '#fff9c4', '#ffcdd2']  # Risk levels - light pastels
         
         fig = go.Figure(data=[go.Sankey(
-            node=dict(label=labels, pad=15, thickness=20,
-                     color=node_colors[:len(labels)],
-                     line=dict(color='white', width=2)),
-            link=dict(source=source, target=target, value=flow_data['count'],
-                     color=link_colors)
+            node=dict(
+                label=labels, 
+                pad=20, 
+                thickness=25,
+                color=node_colors[:len(labels)],
+                line=dict(color='#1a1a1a', width=2),  # Dark border
+            ),
+            link=dict(
+                source=source, 
+                target=target, 
+                value=flow_data['count'],
+                color=link_colors
+            ),
+            textfont=dict(color='#1a1a1a', size=14, family='Arial Black')  # Dark, bold text
         )])
-        fig.update_layout(title='🌊 Flow Diagram', font=dict(size=12, color='#1a1a1a'))
+        fig.update_layout(
+            title='🌊 Flow from Time to Risk Level',
+            font=dict(size=14, color='#1a1a1a', family='Arial'),
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(255,255,255,0.9)'
+        )
         st.plotly_chart(fig, use_container_width=True)
 
 elif page == "Engineer" and st.session_state.data_loaded:
@@ -1091,23 +1108,77 @@ elif page == "Predict" and st.session_state.data_loaded:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        text_input = st.text_area("Post Content", "I feel overwhelmed...", height=100)
-        post_length = st.slider("Length", 10, 500, len(text_input))
-        engagement_rate = st.slider("Engagement", 0.0, 1.0, 0.5)
+        text_input = st.text_area("Post Content", "I feel overwhelmed...", height=150)
+        st.info("💡 Try: 'I want to die', 'I feel hopeless', 'Everything is great!'")
     
     with col2:
+        engagement_rate = st.slider("Engagement Rate", 0.0, 1.0, 0.3)
         previous_posts = st.number_input("Previous Posts", 0, 1000, 100)
         account_age = st.number_input("Account Age (days)", 1, 3650, 365)
     
     with col3:
         followers = st.number_input("Followers", 0, 10000, 500)
-        sentiment = st.slider("Sentiment", -1.0, 1.0, 0.0)
+        st.info("📊 Other features calculated automatically from text")
     
     if st.button("🎯 ANALYZE RISK", use_container_width=True, type="primary"):
         if 'models' in st.session_state:
-            with st.spinner("Analyzing..."):
+            with st.spinner("🔍 Analyzing text content..."):
+                progress = st.progress(0)
+                for i in range(100):
+                    time.sleep(0.01)
+                    progress.progress(i + 1)
+                
+                # REAL TEXT ANALYSIS
+                post_length = len(text_input)
+                word_count = len(text_input.split())
+                
+                # Analyze sentiment from actual text
+                blob = TextBlob(text_input)
+                text_sentiment = blob.sentiment.polarity
+                text_subjectivity = blob.sentiment.subjectivity
+                
+                # Check for high-risk keywords
+                high_risk_words = ['die', 'death', 'kill', 'suicide', 'end it', 'worthless', 
+                                  'hopeless', 'no point', 'give up', 'can\'t go on', 'nobody cares',
+                                  'better off dead', 'want to die', 'end my life', 'no reason to live']
+                
+                medium_risk_words = ['sad', 'depressed', 'alone', 'lonely', 'anxious', 'scared',
+                                    'worried', 'stressed', 'overwhelmed', 'struggling', 'difficult',
+                                    'hard time', 'can\'t cope', 'breaking down']
+                
+                low_risk_words = ['happy', 'great', 'excited', 'wonderful', 'amazing', 'good',
+                                 'grateful', 'blessed', 'fortunate', 'optimistic', 'hopeful',
+                                 'looking forward', 'positive', 'love', 'joy']
+                
+                text_lower = text_input.lower()
+                
+                # Count risk indicators
+                high_risk_count = sum(1 for word in high_risk_words if word in text_lower)
+                medium_risk_count = sum(1 for word in medium_risk_words if word in text_lower)
+                low_risk_count = sum(1 for word in low_risk_words if word in text_lower)
+                
+                # Calculate risk score based on text content
+                if high_risk_count > 0:
+                    # High risk detected from keywords
+                    text_risk_score = -0.8 - (high_risk_count * 0.1)  # Very negative sentiment
+                    text_risk_score = max(text_risk_score, -1.0)
+                elif medium_risk_count > 0:
+                    # Medium risk
+                    text_risk_score = -0.3 - (medium_risk_count * 0.1)
+                elif low_risk_count > 0:
+                    # Low risk - positive content
+                    text_risk_score = 0.5 + (low_risk_count * 0.1)
+                    text_risk_score = min(text_risk_score, 1.0)
+                else:
+                    # Use TextBlob sentiment
+                    text_risk_score = text_sentiment
+                
+                # Combine with TextBlob sentiment
+                final_sentiment = (text_risk_score * 0.7) + (text_sentiment * 0.3)
+                
+                # Prepare features for model
                 input_data = np.array([[post_length, engagement_rate, previous_posts,
-                                       account_age, followers, sentiment]])
+                                       account_age, followers, final_sentiment]])
                 
                 best_model = max(st.session_state.models.items(), key=lambda x: x[1]['accuracy'])
                 
@@ -1121,14 +1192,29 @@ elif page == "Predict" and st.session_state.data_loaded:
                 prediction = best_model[1]['model'].predict(input_scaled)[0]
                 proba = best_model[1]['model'].predict_proba(input_scaled)[0]
                 
+                # OVERRIDE prediction based on keyword detection for safety
+                if high_risk_count >= 2:
+                    # Force high risk if multiple危险 keywords
+                    prediction = 2  # High risk
+                    proba = np.array([0.05, 0.15, 0.80])
+                elif high_risk_count == 1:
+                    # Boost high risk probability
+                    proba = np.array([0.10, 0.30, 0.60])
+                    prediction = 2
+                elif medium_risk_count >= 2:
+                    prediction = 1  # Medium risk
+                    proba = np.array([0.20, 0.60, 0.20])
+                
                 le = LabelEncoder()
                 le.fit(['Low', 'Medium', 'High'])
                 risk_level = le.inverse_transform([prediction])[0]
                 
+                progress.empty()
+                
                 if risk_level == "High":
                     color = "#ff6b6b"
                     icon = "🔴"
-                    message = "HIGH RISK - IMMEDIATE ATTENTION"
+                    message = "HIGH RISK - IMMEDIATE ATTENTION REQUIRED"
                 elif risk_level == "Medium":
                     color = "#f5af19"
                     icon = "🟡"
@@ -1139,6 +1225,16 @@ elif page == "Predict" and st.session_state.data_loaded:
                     message = "LOW RISK - STANDARD MONITORING"
                 
                 st.markdown("---")
+                
+                # Show detected keywords
+                if high_risk_count > 0 or medium_risk_count > 0:
+                    detected = []
+                    if high_risk_count > 0:
+                        detected.append(f"🔴 {high_risk_count} high-risk keyword(s)")
+                    if medium_risk_count > 0:
+                        detected.append(f"🟡 {medium_risk_count} medium-risk keyword(s)")
+                    
+                    st.warning(f"⚠️ Detected: {', '.join(detected)}")
                 
                 st.markdown(f"""
                 <div style='background: {color}; 
@@ -1153,6 +1249,24 @@ elif page == "Predict" and st.session_state.data_loaded:
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
+                # Show analysis details
+                with st.expander("📊 Analysis Details"):
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric("📝 Word Count", word_count)
+                    col2.metric("😊 Sentiment", f"{final_sentiment:.2f}")
+                    col3.metric("📊 Subjectivity", f"{text_subjectivity:.2f}")
+                    
+                    st.markdown("**Detected Keywords:**")
+                    if high_risk_count > 0:
+                        detected_high = [w for w in high_risk_words if w in text_lower]
+                        st.error(f"🔴 High Risk: {', '.join(detected_high[:5])}")
+                    if medium_risk_count > 0:
+                        detected_med = [w for w in medium_risk_words if w in text_lower]
+                        st.warning(f"🟡 Medium Risk: {', '.join(detected_med[:5])}")
+                    if low_risk_count > 0:
+                        detected_low = [w for w in low_risk_words if w in text_lower]
+                        st.success(f"🟢 Positive: {', '.join(detected_low[:5])}")
+                
                 col1, col2, col3 = st.columns(3)
                 col1.metric("🟢 Low", f"{proba[0]*100:.1f}%")
                 col2.metric("🟡 Medium", f"{proba[1]*100:.1f}%")
@@ -1164,14 +1278,43 @@ elif page == "Predict" and st.session_state.data_loaded:
                 })
                 
                 fig = px.bar(proba_df, x='Risk', y='Probability',
-                            title='Risk Distribution',
+                            title='Risk Probability Distribution',
                             color='Risk',
                             color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
                 fig.update_traces(texttemplate='%{y:.1f}%', textposition='outside')
                 fig.update_layout(font=dict(size=13, color='#1a1a1a'))
                 st.plotly_chart(fig, use_container_width=True)
+                
+                # Show recommendations
+                if risk_level == "High":
+                    st.markdown("""
+                    <div style='background: linear-gradient(135deg, #ff6b6b, #f5576c); 
+                                padding: 30px; border-radius: 15px; color: white; margin-top: 20px;'>
+                        <h3 style='color: white !important; margin-bottom: 15px;'>🚨 IMMEDIATE ACTION REQUIRED</h3>
+                        <ul style='font-size: 1.05rem; line-height: 2; color: white !important;'>
+                            <li>Contact mental health professional immediately</li>
+                            <li>Call crisis hotline: <b>988 (USA)</b></li>
+                            <li>Text HOME to <b>741741</b></li>
+                            <li>Do not leave person alone</li>
+                            <li>Remove access to means of self-harm</li>
+                        </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif risk_level == "Medium":
+                    st.markdown("""
+                    <div style='background: linear-gradient(135deg, #f5af19, #f39c12); 
+                                padding: 25px; border-radius: 15px; color: white; margin-top: 20px;'>
+                        <h3 style='color: white !important; margin-bottom: 15px;'>⚠️ MONITORING RECOMMENDED</h3>
+                        <ul style='font-size: 1.05rem; line-height: 2; color: white !important;'>
+                            <li>Check in regularly with the person</li>
+                            <li>Encourage professional support</li>
+                            <li>Monitor for escalation</li>
+                            <li>Provide crisis resources</li>
+                        </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
         else:
-            st.warning("Train models first!")
+            st.warning("⚠️ Please train models first in the AI Models page!")
 
 elif page == "Docs":
     st.markdown('<p class="main-header">📚 DOCUMENTATION</p>', unsafe_allow_html=True)
