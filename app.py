@@ -760,6 +760,7 @@ if page == "Home":
                 font=dict(size=13, color='#1a1a1a', family='Arial')
             )
             st.plotly_chart(fig, use_container_width=True)
+            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
         
         with col2:
             time_risk = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
@@ -804,6 +805,7 @@ elif page == "Data Hub" and st.session_state.data_loaded:
         
         st.markdown("### 📈 Statistical Summary")
         st.dataframe(df.describe().T, use_container_width=True)
+        st.info("📊 **What this table shows:** Statistical summary of numeric features. Mean = average, Std = spread, Min/Max = range, 25%/50%/75% = quartiles showing distribution.")
     
     with tabs[1]:
         st.markdown("### 💎 Data Quality Report")
@@ -924,6 +926,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
                             marker=dict(line=dict(color='white', width=2)))
             fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
+            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
         
         with col2:
             fig = px.histogram(df, x='engagement_rate', nbins=40,
@@ -932,6 +935,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
             fig.update_traces(marker=dict(line=dict(color='white', width=1)))
             fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
+            st.info("📈 **What this shows:** This histogram shows how engagement rates are distributed across all posts. The x-axis shows engagement level, y-axis shows count. Helps identify typical engagement patterns.")
         
         colors = ['#667eea', '#f093fb', '#4facfe']
         fig = go.Figure()
@@ -939,6 +943,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
             fig.add_trace(go.Box(y=df[col], name=col, marker_color=colors[idx]))
         fig.update_layout(title='📦 Feature Distributions', font=dict(size=13, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
+        st.info("📦 **What this shows:** Box plots compare the distribution of post length, previous posts count, and follower count. The box shows middle 50% of values, line shows median, dots show outliers.")
     
     with viz_tabs[1]:
         st.markdown("### 🔗 Correlation Matrix")
@@ -951,6 +956,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
                        color_continuous_scale='RdBu_r')
         fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
+        st.info("🔥 **What this shows:** This heatmap reveals relationships between all numeric features. Red = strong positive correlation, Blue = strong negative correlation, White = no correlation. Numbers show exact correlation strength (-1 to 1).")
     
     with viz_tabs[2]:
         st.markdown("### ⏰ Temporal Patterns")
@@ -965,6 +971,7 @@ elif page == "Explorer" and st.session_state.data_loaded:
                         barmode='group')
             fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
+            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
         
         with col2:
             day_risk = df.groupby(['day_of_week', 'risk_level']).size().reset_index(name='count')
@@ -1006,10 +1013,12 @@ elif page == "Explorer" and st.session_state.data_loaded:
                            color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
             fig.update_layout(font=dict(size=13, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
+            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
         
         with col2:
             wordcloud_fig = create_wordcloud(df['text'])
             st.pyplot(wordcloud_fig)
+            st.info("☁️ **What this shows:** Word cloud displays the most frequently used words in all posts. Larger words appear more often, helping identify common themes and concerns.")
 
 elif page == "Visuals Pro" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🎨 VISUALIZATION STUDIO</p>', unsafe_allow_html=True)
@@ -1024,6 +1033,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
     )
     
     if viz_type == "3D Scatter":
+        st.info("🎯 **What this shows:** Three-dimensional view of post length, engagement rate, and follower count colored by risk level. Helps identify clustering patterns in high-risk content.")
         fig = px.scatter_3d(df, x='post_length', y='engagement_rate', z='sentiment_score',
                            color='risk_level', size='follower_count',
                            title='🌌 3D Feature Space',
@@ -1033,6 +1043,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
         st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Sunburst":
+        st.info("🌅 **What this shows:** Hierarchical sunburst showing risk distribution across time periods. Inner ring = time of day, outer rings = how risk levels distribute within each period.")
         fig = px.sunburst(df, path=['risk_level', 'time_of_day', 'day_of_week'],
                          title='☀️ Hierarchical Distribution',
                          color='risk_level',
@@ -1081,6 +1092,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
         st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Treemap":
+        st.info("🗺️ **What this shows:** Treemap shows hierarchical data as nested rectangles. Size represents volume, color represents risk level, helping visualize proportions.")
         fig = px.treemap(df, path=['risk_level', 'time_of_day'],
                         title='🗺️ Risk Treemap',
                         color='risk_level',
