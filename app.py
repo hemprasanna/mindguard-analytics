@@ -56,12 +56,8 @@ st.markdown("""
         font-weight: 900 !important;
         text-align: center !important;
         margin: 30px 0 !important;
-        color: #1a1a1a !important;
-        text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
-        background: linear-gradient(135deg, #1976d2, #1565c0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #2c3e50 !important;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
     }
     
     /* Buttons with excellent contrast */
@@ -818,6 +814,8 @@ elif page == "AI Models" and st.session_state.data_loaded:
                 st.session_state.X_test = X_test_scaled
                 st.session_state.y_test = y_test
                 st.session_state.label_encoder = le
+                st.session_state.X_train_scaled = X_train_scaled
+                st.session_state.y_train = y_train
                 
                 performance_df = pd.DataFrame({
                     'Model': list(models.keys()),
@@ -832,6 +830,10 @@ elif page == "AI Models" and st.session_state.data_loaded:
     with model_tabs[1]:
         if 'models' in st.session_state:
             st.markdown("### 📊 Performance")
+            
+            # Get y_test and le from session state
+            y_test = st.session_state.y_test
+            le = st.session_state.label_encoder
             
             for model_name, result in st.session_state.models.items():
                 with st.expander(f"🎯 {model_name} - {result['accuracy']:.4f}", expanded=True):
@@ -858,27 +860,37 @@ elif page == "AI Models" and st.session_state.data_loaded:
     with model_tabs[2]:
         st.markdown("### 🎛️ Tuning")
         
-        model_choice = st.selectbox("Model", ["Random Forest", "Gradient Boosting"])
-        
-        if model_choice == "Random Forest":
-            n_est = st.slider("Trees", 50, 300, 100, 25)
-            max_d = st.slider("Depth", 5, 50, 10, 5)
+        if 'models' in st.session_state:
+            # Get training data from session state
+            X_train_scaled = st.session_state.get('X_train_scaled')
+            y_train = st.session_state.get('y_train')
             
-            if st.button("Optimize"):
-                with st.spinner("Tuning..."):
-                    model = RandomForestClassifier(n_estimators=n_est, max_depth=max_d, random_state=42)
-                    scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
-                    st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
-        
+            if X_train_scaled is not None and y_train is not None:
+                model_choice = st.selectbox("Model", ["Random Forest", "Gradient Boosting"])
+                
+                if model_choice == "Random Forest":
+                    n_est = st.slider("Trees", 50, 300, 100, 25)
+                    max_d = st.slider("Depth", 5, 50, 10, 5)
+                    
+                    if st.button("Optimize"):
+                        with st.spinner("Tuning..."):
+                            model = RandomForestClassifier(n_estimators=n_est, max_depth=max_d, random_state=42)
+                            scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
+                            st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
+                
+                else:
+                    lr = st.slider("Learning Rate", 0.01, 0.3, 0.1, 0.01)
+                    n_est = st.slider("Estimators", 50, 300, 100, 25)
+                    
+                    if st.button("Optimize"):
+                        with st.spinner("Tuning..."):
+                            model = GradientBoostingClassifier(learning_rate=lr, n_estimators=n_est, random_state=42)
+                            scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
+                            st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
+            else:
+                st.warning("Train models first in the Train tab!")
         else:
-            lr = st.slider("Learning Rate", 0.01, 0.3, 0.1, 0.01)
-            n_est = st.slider("Estimators", 50, 300, 100, 25)
-            
-            if st.button("Optimize"):
-                with st.spinner("Tuning..."):
-                    model = GradientBoostingClassifier(learning_rate=lr, n_estimators=n_est, random_state=42)
-                    scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
-                    st.success(f"Score: {scores.mean():.4f} ± {scores.std():.4f}")
+            st.warning("Train models first in the Train tab!")
 
 elif page == "Predict" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🔮 AI PREDICTION ENGINE</p>', unsafe_allow_html=True)
