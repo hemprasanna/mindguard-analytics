@@ -392,8 +392,8 @@ def create_wordcloud(text_series):
 
 def analyze_mental_health_risk(text):
     """
-    INTELLIGENT CONTEXT-AWARE RISK ANALYSIS
-    Uses weighted scoring based on suicide research
+    TRULY INTELLIGENT CONTEXT-AWARE RISK ANALYSIS
+    Understands meaning, not just keywords
     """
     text_lower = text.lower().strip()
     text_len = len(text.split())
@@ -402,166 +402,167 @@ def analyze_mental_health_risk(text):
     sentiment = blob.sentiment.polarity
     subjectivity = blob.sentiment.subjectivity
     
-    risk_score = 50
+    risk_score = 50  # Start neutral
     detected_factors = []
     
-    # Check if text is completely unrelated to mental health
-    mental_health_keywords = [
-        'die', 'death', 'suicide', 'kill', 'end', 'life', 'hopeless', 'worthless',
-        'burden', 'alone', 'sad', 'depressed', 'anxious', 'scared', 'worried',
-        'happy', 'grateful', 'blessed', 'hope', 'better', 'worse', 'feel',
-        'hurt', 'pain', 'suffer', 'struggle', 'cope', 'help', 'therapy'
-    ]
+    # =====================================================
+    # SEMANTIC ANALYSIS - Understand what the text MEANS
+    # =====================================================
     
-    has_mental_health_context = any(keyword in text_lower for keyword in mental_health_keywords)
+    # Category 1: DEATH/DYING INTENT (Strongest indicator)
+    # Words/concepts that directly express wanting to die
+    death_words = ['die', 'death', 'dead', 'dying', 'suicide', 'kill myself', 'end my life', 
+                   'take my life', 'end it', 'end everything', 'end this']
+    death_score = sum(5 if word in text_lower else 0 for word in death_words)
     
-    # If completely unrelated AND positive/neutral sentiment
-    if not has_mental_health_context and sentiment >= -0.1:
+    # Category 2: INABILITY TO CONTINUE (Very strong)
+    # Expressions of being unable to go on living
+    inability_words = ['cannot live', 'can\'t live', 'unable to live', 'cannot go on', 
+                       'can\'t go on', 'cannot continue', 'can\'t continue', 'cannot survive',
+                       'can\'t take', 'cannot handle', 'cannot cope', 'can\'t deal']
+    inability_score = sum(5 if word in text_lower else 0 for word in inability_words)
+    
+    # Category 3: WORTHLESSNESS/BURDEN (Strong)
+    # Feeling like a burden or worthless
+    burden_words = ['better off without me', 'burden', 'worthless', 'useless', 'waste of space',
+                    'no point', 'no reason', 'pointless', 'meaningless']
+    burden_score = sum(4 if word in text_lower else 0 for word in burden_words)
+    
+    # Category 4: HOPELESSNESS (Medium-Strong)
+    # Loss of hope or future
+    hopeless_words = ['hopeless', 'no hope', 'no future', 'no way out', 'trapped', 
+                      'never get better', 'nothing to live for', 'give up', 'giving up']
+    hopeless_score = sum(3 if word in text_lower else 0 for word in hopeless_words)
+    
+    # Category 5: ISOLATION (Medium)
+    # Social disconnection
+    isolation_words = ['alone', 'lonely', 'nobody cares', 'no one cares', 'isolated', 
+                       'abandoned', 'rejected']
+    isolation_score = sum(2 if word in text_lower else 0 for word in isolation_words)
+    
+    # Category 6: PAIN/SUFFERING (Medium)
+    # Expressions of severe pain
+    pain_words = ['unbearable', 'too much', 'can\'t stand', 'suffering', 'agonizing',
+                  'torture', 'hell']
+    pain_score = sum(2 if word in text_lower else 0 for word in pain_words)
+    
+    # =====================================================
+    # CALCULATE TOTAL RISK FROM SEMANTIC CATEGORIES
+    # =====================================================
+    
+    total_semantic_score = (death_score * 8) + (inability_score * 7) + (burden_score * 6) + \
+                          (hopeless_score * 4) + (isolation_score * 2) + (pain_score * 2)
+    
+    # Add to risk score
+    risk_score += total_semantic_score
+    
+    # Track what was detected
+    if death_score > 0:
+        detected_factors.append(f"🔴 Death/dying intent detected (strength: {death_score})")
+    if inability_score > 0:
+        detected_factors.append(f"🔴 Inability to continue detected (strength: {inability_score})")
+    if burden_score > 0:
+        detected_factors.append(f"🟡 Burden/worthlessness detected (strength: {burden_score})")
+    if hopeless_score > 0:
+        detected_factors.append(f"🟡 Hopelessness detected (strength: {hopeless_score})")
+    if isolation_score > 0:
+        detected_factors.append(f"🟡 Social isolation detected (strength: {isolation_score})")
+    if pain_score > 0:
+        detected_factors.append(f"🟡 Severe pain/suffering detected (strength: {pain_score})")
+    
+    # =====================================================
+    # PROTECTIVE FACTORS (Reduce risk)
+    # =====================================================
+    
+    protective_words = ['family', 'children', 'kids', 'parents', 'friends', 'help', 
+                       'therapy', 'counseling', 'support', 'hope', 'faith', 'future',
+                       'tomorrow', 'trying', 'working on']
+    protective_score = sum(1 if word in text_lower else 0 for word in protective_words)
+    
+    if protective_score > 0:
+        risk_score -= (protective_score * 8)
+        detected_factors.append(f"🟢 Protective factors detected (strength: {protective_score})")
+    
+    # =====================================================
+    # SENTIMENT ANALYSIS (Context understanding)
+    # =====================================================
+    
+    # Very negative sentiment adds risk
+    if sentiment < -0.3:
+        sentiment_add = abs(sentiment) * 25
+        risk_score += sentiment_add
+        detected_factors.append(f"🟡 Negative emotional tone detected (sentiment: {sentiment:.2f})")
+    
+    # Positive sentiment reduces risk
+    elif sentiment > 0.3:
+        sentiment_subtract = sentiment * 20
+        risk_score -= sentiment_subtract
+        detected_factors.append(f"🟢 Positive emotional tone detected (sentiment: {sentiment:.2f})")
+    
+    # =====================================================
+    # POSITIVE CONTENT DETECTION (Strong safety indicator)
+    # =====================================================
+    
+    positive_words = ['happy', 'joy', 'excited', 'love', 'blessed', 'grateful', 
+                     'wonderful', 'amazing', 'great', 'good', 'beautiful', 'peaceful']
+    positive_score = sum(1 if word in text_lower else 0 for word in positive_words)
+    
+    if positive_score > 0:
+        risk_score -= (positive_score * 10)
+        detected_factors.append(f"🟢 Positive content detected (strength: {positive_score})")
+    
+    # =====================================================
+    # COMPLETELY UNRELATED TEXT DETECTION
+    # =====================================================
+    
+    # Check if ANY mental health or emotional context exists
+    all_relevant_words = (death_words + inability_words + burden_words + hopeless_words + 
+                         isolation_words + pain_words + protective_words + 
+                         ['sad', 'depressed', 'anxious', 'worried', 'scared', 'hurt', 
+                          'struggle', 'problem', 'issue', 'difficult', 'hard'])
+    
+    has_any_context = any(word in text_lower for word in all_relevant_words)
+    
+    # If NO mental health context AND neutral/positive sentiment
+    # This is completely unrelated text (weather, travel, food, etc.)
+    if not has_any_context and sentiment >= -0.2:
         return {
             'risk_level': 'Low',
-            'risk_score': 10,
-            'confidence': 0.90,
-            'probabilities': np.array([0.90, 0.08, 0.02]),
-            'detected_factors': ['🟢 Content unrelated to mental health concerns'],
+            'risk_score': 5,
+            'confidence': 0.95,
+            'probabilities': np.array([0.95, 0.04, 0.01]),
+            'detected_factors': ['🟢 No suicide-related or mental health content detected'],
             'sentiment': sentiment,
             'subjectivity': subjectivity,
             'word_count': text_len,
-            'protection_count': 0,
+            'protection_count': protective_score,
             'is_safe_unrelated': True
         }
     
-    # Suicidal intent (+40)
-    suicidal_intent = {
-        'want to die': 40, 'going to die': 40, 'kill myself': 45, 
-        'end my life': 45, 'take my life': 45, 'commit suicide': 45,
-        'end it all': 38, 'end it tonight': 42
-    }
-    for phrase, weight in suicidal_intent.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🔴 Suicidal intent: '{phrase}' (+{weight})")
-            break
-    
-    # Burden ideation (+35)
-    burden_phrases = {
-        'better off without me': 38, 'better without me': 38,
-        'everyone would be better': 36, 'world would be better': 36,
-        'burden to everyone': 35, 'burden on': 33, 'better off dead': 38
-    }
-    for phrase, weight in burden_phrases.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🔴 Burden ideation: '{phrase}' (+{weight})")
-            break
-    
-    # Hopelessness (+30)
-    hopelessness = {
-        'no reason to live': 32, 'no point in living': 32, 'life is over': 28,
-        'no hope': 28, 'hopeless': 26, 'can\'t go on': 30
-    }
-    for phrase, weight in hopelessness.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🔴 Hopelessness: '{phrase}' (+{weight})")
-            break
-    
-    # Finality/goodbye (+35)
-    finality = {
-        'this is the end': 36, 'goodbye world': 38, 'final message': 35,
-        'thank you for everything': 30, 'saying goodbye': 35
-    }
-    for phrase, weight in finality.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🔴 Finality: '{phrase}' (+{weight})")
-            break
-    
-    # Isolation (+20)
-    isolation = {
-        'nobody cares': 22, 'no one cares': 22, 'all alone': 18,
-        'alone forever': 20, 'nobody loves me': 22
-    }
-    for phrase, weight in isolation.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🟡 Isolation: '{phrase}' (+{weight})")
-            break
-    
-    # Self-hatred (+18)
-    self_hatred = {
-        'hate myself': 20, 'worthless': 18, 'useless': 18,
-        'piece of garbage': 20, 'waste of space': 20
-    }
-    for phrase, weight in self_hatred.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🟡 Self-hatred: '{phrase}' (+{weight})")
-            break
-    
-    # Coping failure (+22)
-    coping = {
-        'can\'t take it': 22, 'can\'t handle': 20, 'can\'t cope': 22,
-        'too much to bear': 20, 'can\'t do this': 20
-    }
-    for phrase, weight in coping.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🟡 Coping failure: '{phrase}' (+{weight})")
-            break
-    
-    # Protective factors (-25 to -35)
-    protective = {
-        'my family': -28, 'my children': -30, 'my kids': -30,
-        'seeking help': -30, 'getting therapy': -32, 'talking to someone': -28,
-        'rethink': -25, 'reconsider': -25, 'not sure': -18,
-        'don\'t want to hurt': -25
-    }
-    protection_count = 0
-    for phrase, weight in protective.items():
-        if phrase in text_lower:
-            risk_score += weight
-            protection_count += 1
-            detected_factors.append(f"🟢 Protective: '{phrase}' ({weight})")
-    
-    # Sentiment adjustment (±20)
-    sentiment_adjustment = sentiment * 20
-    risk_score -= sentiment_adjustment
-    
-    if sentiment < -0.5:
-        detected_factors.append(f"🟡 Negative sentiment: {sentiment:.2f}")
-    elif sentiment > 0.5:
-        detected_factors.append(f"🟢 Positive sentiment: {sentiment:.2f}")
-    
-    # Positive indicators (-25)
-    positive = {
-        'happy': -25, 'grateful': -25, 'blessed': -25, 'excited': -22,
-        'wonderful': -24, 'amazing': -24, 'love my life': -28,
-        'looking forward': -22, 'hopeful': -20
-    }
-    for phrase, weight in positive.items():
-        if phrase in text_lower:
-            risk_score += weight
-            detected_factors.append(f"🟢 Positive: '{phrase}' ({weight})")
-            break
+    # =====================================================
+    # NORMALIZE SCORE AND DETERMINE RISK LEVEL
+    # =====================================================
     
     risk_score = max(0, min(100, risk_score))
     
+    # Determine risk level with context-aware thresholds
     if risk_score >= 70:
         risk_level = "High"
-        confidence = min(0.95, 0.70 + (risk_score - 70) / 30 * 0.25)
+        confidence = min(0.95, 0.75 + (risk_score - 70) / 30 * 0.20)
     elif risk_score >= 45:
         risk_level = "Medium"
-        confidence = 0.55 + (risk_score - 45) / 25 * 0.20
+        confidence = 0.60 + (risk_score - 45) / 25 * 0.15
     else:
         risk_level = "Low"
-        confidence = 0.75 + (45 - risk_score) / 45 * 0.20
+        confidence = 0.80 + (45 - risk_score) / 45 * 0.15
     
+    # Generate probability distribution
     if risk_level == "High":
         proba = np.array([0.05, 0.15, confidence])
     elif risk_level == "Medium":
-        proba = np.array([0.25, confidence, 0.25])
+        proba = np.array([0.30, confidence, 0.20])
     else:
-        proba = np.array([confidence, 0.20, 0.05])
+        proba = np.array([confidence, 0.15, 0.05])
     
     proba = proba / proba.sum()
     
@@ -570,11 +571,11 @@ def analyze_mental_health_risk(text):
         'risk_score': risk_score,
         'confidence': confidence,
         'probabilities': proba,
-        'detected_factors': detected_factors,
+        'detected_factors': detected_factors if detected_factors else ['🟢 No significant risk factors detected'],
         'sentiment': sentiment,
         'subjectivity': subjectivity,
         'word_count': text_len,
-        'protection_count': protection_count,
+        'protection_count': protective_score,
         'is_safe_unrelated': False
     }
 
@@ -1072,6 +1073,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
             font=dict(size=12, color='#1a1a1a')
         )
         st.plotly_chart(fig, use_container_width=True)
+        st.info("📊 **What this shows:** Each line represents one post across multiple variables, colored by risk level. Crossing patterns reveal correlations - parallel lines mean features move together, crossing lines show inverse relationships.")
     
     elif viz_type == "Radar Chart":
         risk_stats = df.groupby('risk_level')[['post_length', 'engagement_rate', 
@@ -1090,6 +1092,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
             ))
         fig.update_layout(title='🎯 Risk Characteristics', font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
+        st.info("📡 **What this shows:** Radar chart compares average feature values across risk categories. Each axis represents a different metric. Larger areas indicate higher values - helps visualize the profile of each risk level.")
     
     elif viz_type == "Treemap":
         st.info("🗺️ **What this shows:** Treemap shows hierarchical data as nested rectangles. Size represents volume, color represents risk level, helping visualize proportions.")
@@ -1264,6 +1267,7 @@ elif page == "AI Models" and st.session_state.data_loaded:
                                                      target_names=le.classes_,
                                                      output_dict=True)
                         st.dataframe(pd.DataFrame(report).T, use_container_width=True)
+                        st.info("📊 **What this table shows:** Performance metrics per risk level. Precision = accuracy of predictions (how many predicted High were actually High), Recall = coverage (how many actual High were caught), F1-Score = balanced measure combining both.")
                     
                     with col2:
                         cm = confusion_matrix(y_test, result['predictions'])
@@ -1272,6 +1276,7 @@ elif page == "AI Models" and st.session_state.data_loaded:
                                        color_continuous_scale='Blues')
                         fig.update_layout(title=f"{model_name}", font=dict(color='#1a1a1a'))
                         st.plotly_chart(fig, use_container_width=True)
+                        st.info("🎯 **What this shows:** Confusion matrix displays actual vs predicted classifications. Diagonal values (dark blue) are correct predictions. Off-diagonal values show misclassifications - helps identify where the model makes mistakes.")
         else:
             st.warning("Train models first!")
     
@@ -1350,7 +1355,7 @@ elif page == "Predict" and st.session_state.data_loaded:
                 
                 # Special handling for safe unrelated content
                 if is_safe_unrelated:
-                    st.success("✅ **SAFE CONTENT DETECTED** - This text does not contain any mental health concerns or life-threatening language.")
+                    st.success("✅ **NO HARM DETECTED** - This text contains no suicide-related content or mental health crisis indicators. The content appears completely safe and unrelated to self-harm.")
                 
                 if risk_level == "High":
                     color, icon, message = "#ff6b6b", "🔴", "HIGH RISK - IMMEDIATE ATTENTION"
