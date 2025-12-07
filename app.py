@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -20,10 +21,22 @@ import time
 
 warnings.filterwarnings('ignore')
 
-# Page config
+# -------------------------
+# Transformer imports (may not be present in some environments)
+# -------------------------
+try:
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+    import torch.nn.functional as F
+    HAS_TRANSFORMERS = True
+except Exception:
+    HAS_TRANSFORMERS = False
+
+# -------------------------
+# Page config & CSS
+# -------------------------
 st.set_page_config(page_title="MindGuard Analytics", layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS with ocean blue theme
 st.markdown("""
 <style>
     /* Gradient background animation */
@@ -40,7 +53,6 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Vibrant but readable sidebar */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%) !important;
         box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
@@ -50,7 +62,6 @@ st.markdown("""
         color: white !important;
     }
     
-    /* Headers with DARK text for readability */
     .main-header {
         font-size: 3rem !important;
         font-weight: 900 !important;
@@ -60,7 +71,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
     }
     
-    /* Buttons with excellent contrast */
     .stButton > button {
         background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%) !important;
         color: white !important;
@@ -78,7 +88,6 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4) !important;
     }
     
-    /* Dark text for metrics */
     [data-testid="stMetricValue"] {
         color: #1a1a1a !important;
         font-weight: 800 !important;
@@ -89,7 +98,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* All text elements dark for readability */
     .stMarkdown, .stText, p, span, div {
         color: #1a1a1a !important;
     }
@@ -99,12 +107,10 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* Info boxes with dark text */
     .stAlert {
         color: #1a1a1a !important;
     }
     
-    /* Tabs */
     .stTabs [data-baseweb="tab-list"] button {
         color: #1a1a1a !important;
         font-weight: 600 !important;
@@ -117,17 +123,18 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+# -------------------------
+# Utilities: data loading, processing, visuals
+# -------------------------
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 
 def load_data():
-    """Load mental health dataset"""
+    """Load demo mental health dataset"""
     np.random.seed(42)
     n = 1000
     
     risk_levels = np.random.choice(['Low', 'Medium', 'High'], n, p=[0.5, 0.3, 0.2])
-    
     texts = []
     for risk in risk_levels:
         if risk == 'High':
@@ -162,32 +169,25 @@ def load_data():
     return pd.DataFrame(data)
 
 def perform_text_analysis(df):
-    """Add text analysis features"""
     if 'text' not in df.columns:
         return df
-    
     df['text_length'] = df['text'].str.len()
     df['word_count'] = df['text'].str.split().str.len()
-    
     return df
 
 def handle_missing_values(df, method='mean'):
-    """Handle missing values"""
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     df_imputed = df.copy()
-    
     if method == 'mean':
         imputer = SimpleImputer(strategy='mean')
     elif method == 'median':
         imputer = SimpleImputer(strategy='median')
     else:
         imputer = KNNImputer(n_neighbors=5)
-    
     df_imputed[numeric_cols] = imputer.fit_transform(df[numeric_cols])
     return df_imputed
 
 def create_wordcloud(text_series):
-    """Generate word cloud"""
     text = ' '.join(text_series.astype(str))
     wordcloud = WordCloud(width=800, height=400, background_color='white',
                          colormap='viridis').generate(text)
@@ -196,179 +196,125 @@ def create_wordcloud(text_series):
     ax.axis('off')
     return fig
 
-def analyze_mental_health_risk_transformer(text):
+# -------------------------
+# NEW: Real Transformer Classifier (cached)
+# -------------------------
+@st.cache_resource
+def load_suicide_transformer(model_name="joeddav/distilbert-base-uncased-go-emotions-suicidality"):
+    """Load the tokenizer + model and return them. Cached for performance."""
+    if not HAS_TRANSFORMERS:
+        return None, None
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    # set model to eval
+    model.eval()
+    return tokenizer, model
+
+def analyze_with_transformer(text):
     """
-    New and improved suicide-risk classifier using:
-    - Sentence-BERT embeddings
-    - Expanded semantic reference clusters
-    - Emotion/sentiment signals
-    - Unrelated-content detection
+    Uses a pretrained suicidality classifier to return:
+    - risk_level: 'Low'/'Medium'/'High'
+    - risk_score: int 0-100 (derived from probs)
+    - confidence: top probability
+    - probabilities: [low_prob, med_prob, high_prob]
+    - detected_factors: list of strings
+    - sentiment: sentiment polarity
+    - is_safe_unrelated: boolean flag for unrelated content
     """
-    try:
-        from sentence_transformers import SentenceTransformer
-        from sklearn.metrics.pairwise import cosine_similarity
-        from textblob import TextBlob
-    except Exception as e:
-        st.error("⚠️ Missing dependency for transformer analysis. Install sentence-transformers and textblob.")
+    # fallback if transformers not installed
+    if not HAS_TRANSFORMERS:
         return {
             'risk_level': 'Medium',
             'risk_score': 50,
             'confidence': 0.5,
-            'probabilities': np.array([0.33, 0.34, 0.33]),
-            'detected_factors': ['❌ sentence-transformers not available'],
-            'sentiment': 0,
+            'probabilities': np.array([0.33,0.34,0.33]),
+            'detected_factors': ['❌ transformers/torch not installed'],
+            'sentiment': 0.0,
             'is_safe_unrelated': False
         }
 
-    # Load model (small, fast, good semantic performance)
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    tokenizer, model = load_suicide_transformer()
+    if tokenizer is None or model is None:
+        return {
+            'risk_level': 'Medium',
+            'risk_score': 50,
+            'confidence': 0.5,
+            'probabilities': np.array([0.33,0.34,0.33]),
+            'detected_factors': ['❌ model failed to load'],
+            'sentiment': 0.0,
+            'is_safe_unrelated': False
+        }
 
     text_clean = text.strip()
-    if not text_clean:
+    if len(text_clean) == 0:
         return {
             'risk_level': 'Low',
             'risk_score': 1,
             'confidence': 0.95,
             'probabilities': np.array([0.95, 0.04, 0.01]),
-            'detected_factors': ['🟢 Empty or whitespace-only input — treated as no risk'],
+            'detected_factors': ['🟢 Empty input treated as no risk'],
             'sentiment': 0.0,
             'is_safe_unrelated': True
         }
 
-    # Sentiment
-    blob = TextBlob(text)
+    # Sentiment analysis (auxiliary)
+    blob = TextBlob(text_clean)
     sentiment = blob.sentiment.polarity
 
-    # Input embedding
-    emb = model.encode([text_clean])[0]
+    # Tokenize and infer
+    inputs = tokenizer(text_clean, return_tensors="pt", truncation=True, padding=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+        logits = outputs.logits[0]
+        probs = F.softmax(logits, dim=0).cpu().numpy()
 
-    # Reference clusters (expanded and diverse)
-    high_risk_examples = [
-        "I want to die", "I don't want to live", "life is not worth living",
-        "I want to end everything", "I feel like killing myself",
-        "I can't continue anymore", "I feel completely hopeless",
-        "I want to disappear forever", "there is no reason to live",
-        "my life is useless", "I wish I was dead", "I have thought about ending my life"
-    ]
+    # Model assumed to have 3 classes: [None/NoRisk, Low, High] (index 0,1,2)
+    # We'll map -> App labels: 0->Low, 1->Medium, 2->High
+    low_prob, med_prob, high_prob = float(probs[0]), float(probs[1]), float(probs[2])
 
-    medium_risk_examples = [
-        "I am really struggling", "I feel lost and empty",
-        "I hate my life sometimes", "I feel sad and hopeless",
-        "nothing makes sense anymore", "I don’t feel okay",
-        "I feel like giving up", "everything is falling apart",
-        "I can’t handle this stress", "I don’t feel like myself",
-        "sometimes I think about whether to continue"
-    ]
+    # Compose risk score heuristic: emphasize high probability
+    risk_score = int(high_prob*100 + med_prob*40)
 
-    low_risk_examples = [
-        "I am fine", "I love my life", "I am doing okay",
-        "I feel happy today", "I want to live a good life",
-        "enjoying my day", "the weather is nice",
-        "I like spending time with my friends", "I’m having a good day",
-        "everything is normal", "I have plans for the weekend"
-    ]
+    # Unrelated detection: if model strongly predicts 'none' and sentiment not negative -> unrelated
+    is_safe_unrelated = False
+    if low_prob > 0.85 and sentiment >= -0.15:
+        is_safe_unrelated = True
 
-    unrelated_examples = [
-        "I want to eat chocolate", "the car is fast", "I like programming",
-        "I went shopping yesterday", "the weather is sunny",
-        "I want to study today", "I am learning python",
-        "I have an exam tomorrow", "I want to bake a cake", "My cat is cute"
-    ]
-
-    # Compute embeddings for references
-    high_emb = model.encode(high_risk_examples)
-    med_emb = model.encode(medium_risk_examples)
-    low_emb = model.encode(low_risk_examples)
-    unrelated_emb = model.encode(unrelated_examples)
-
-    # Max similarity to each reference set
-    sim_high = float(cosine_similarity([emb], high_emb).max())
-    sim_med = float(cosine_similarity([emb], med_emb).max())
-    sim_low = float(cosine_similarity([emb], low_emb).max())
-    sim_unrelated = float(cosine_similarity([emb], unrelated_emb).max())
-
-    # 1) If the text is semantically closer to unrelated examples and sentiment is not strongly negative => Low
-    if sim_unrelated > max(sim_high, sim_med, sim_low) and sentiment >= -0.2:
-        return {
-            'risk_level': 'Low',
-            'risk_score': 3,
-            'confidence': 0.96,
-            'probabilities': np.array([0.96, 0.03, 0.01]),
-            'detected_factors': [
-                '🟢 No suicide intent detected.',
-                '🟢 Content appears unrelated to mental-health crisis.',
-                f'🔎 Similarity to unrelated examples: {sim_unrelated:.2f}'
-            ],
-            'sentiment': sentiment,
-            'high_similarity': sim_high,
-            'medium_similarity': sim_med,
-            'low_similarity': sim_low,
-            'is_safe_unrelated': True
-        }
-
-    # 2) Very positive sentiment => low risk (defensive rule)
-    if sentiment > 0.45:
-        return {
-            'risk_level': 'Low',
-            'risk_score': 5,
-            'confidence': 0.9,
-            'probabilities': np.array([0.9, 0.08, 0.02]),
-            'detected_factors': [
-                '🟢 Positive emotional tone detected.',
-                f'💭 Sentiment: {sentiment:.2f}'
-            ],
-            'sentiment': sentiment,
-            'high_similarity': sim_high,
-            'medium_similarity': sim_med,
-            'low_similarity': sim_low,
-            'is_safe_unrelated': False
-        }
-
-    # 3) Combine similarities and sentiment into raw scores
-    raw_high = sim_high * 1.45 + (0.15 if sentiment < -0.25 else 0.0)
-    raw_med = sim_med * 1.2 + (0.08 if sentiment < -0.15 else 0.0)
-    raw_low = sim_low * 1.0 + (0.12 if sentiment > 0.05 else 0.0)
-
-    total = raw_high + raw_med + raw_low + 1e-9
-    p_high = raw_high / total
-    p_med = raw_med / total
-    p_low = raw_low / total
-
-    # Decision thresholds tuned for balanced sensitivity
-    if p_high > 0.45 and sim_high > 0.45 and sentiment <= 0.15:
+    # Determine risk level thresholds (tuned for balanced sensitivity)
+    if high_prob >= 0.45 and high_prob > med_prob and sentiment <= 0.25:
         risk_level = "High"
-    elif p_med > 0.40:
+    elif med_prob >= 0.35 and med_prob > low_prob:
         risk_level = "Medium"
     else:
         risk_level = "Low"
 
-    detected = [
-        f"🔎 Similarity → High: {sim_high:.2f}",
-        f"🔎 Similarity → Medium: {sim_med:.2f}",
-        f"🔎 Similarity → Low: {sim_low:.2f}",
+    detected_factors = [
+        f"🔎 Model probabilities — Low: {low_prob:.2f}, Medium: {med_prob:.2f}, High: {high_prob:.2f}",
         f"💭 Sentiment: {sentiment:.2f}"
     ]
-    if sim_high > 0.55 and sentiment < -0.2:
-        detected.append("🔴 Strong semantic match to suicidal ideation.")
-    elif sim_med > 0.5:
-        detected.append("🟡 Moderate semantic match to distress/ideation.")
-
-    confidence = max(p_low, p_med, p_high)
+    if high_prob > 0.6:
+        detected_factors.append("🔴 Strong model signal for severe suicidal ideation.")
+    elif med_prob > 0.5:
+        detected_factors.append("🟡 Moderate signal for distress / ideation.")
+    elif is_safe_unrelated:
+        detected_factors.append("🟢 High confidence for unrelated/neutral content.")
 
     return {
         'risk_level': risk_level,
-        'risk_score': int(p_high * 100 + p_med * 40),
-        'confidence': float(confidence),
-        'probabilities': np.array([p_low, p_med, p_high]),
-        'detected_factors': detected,
+        'risk_score': risk_score,
+        'confidence': max(low_prob, med_prob, high_prob),
+        'probabilities': np.array([low_prob, med_prob, high_prob]),
+        'detected_factors': detected_factors,
         'sentiment': sentiment,
-        'high_similarity': sim_high,
-        'medium_similarity': sim_med,
-        'low_similarity': sim_low,
-        'is_safe_unrelated': False
+        'high_similarity': high_prob,
+        'medium_similarity': med_prob,
+        'low_similarity': low_prob,
+        'is_safe_unrelated': is_safe_unrelated
     }
 
-# SIDEBAR
+# -------------------------
+# Sidebar & Navigation
+# -------------------------
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; margin-bottom: 20px;'>🛡️ MindGuard</h2>", unsafe_allow_html=True)
     
@@ -392,7 +338,9 @@ with st.sidebar:
     🌍 findahelpline.com
     """)
 
-# HOME PAGE
+# -------------------------
+# Home page
+# -------------------------
 if page == "Home":
     st.markdown('<p class="main-header">🛡️ MINDGUARD ANALYTICS</p>', unsafe_allow_html=True)
     
@@ -400,7 +348,7 @@ if page == "Home":
     <div style='text-align: center; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 20px 0;'>
         <h2 style='color: #1a1a1a;'>AI-Powered Mental Health Risk Assessment</h2>
         <p style='font-size: 1.2rem; color: #2c3e50;'>
-            Using transformer-based NLP with sentence embeddings for accurate semantic understanding
+            Using transformer-based NLP with a real suicidality classifier for semantic understanding
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -411,7 +359,7 @@ if page == "Home":
         st.markdown("""
         <div style='background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; border-radius: 15px; color: white; text-align: center;'>
             <h3>🧠 Transformer-Based</h3>
-            <p>Sentence-BERT embeddings for semantic understanding</p>
+            <p>DistilBERT-based suicidality classifier</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -442,7 +390,9 @@ if page == "Home":
         st.success("✅ Data loaded successfully!")
         st.rerun()
 
-
+# -------------------------
+# Data Hub
+# -------------------------
 elif page == "Data Hub" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">📊 DATA HUB</p>', unsafe_allow_html=True)
     
@@ -502,6 +452,9 @@ elif page == "Data Hub" and st.session_state.data_loaded:
         | day_of_week | Day of posting |
         """)
 
+# -------------------------
+# Explorer
+# -------------------------
 elif page == "Explorer" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🔍 DATA EXPLORER PRO</p>', unsafe_allow_html=True)
     
@@ -594,6 +547,9 @@ elif page == "Explorer" and st.session_state.data_loaded:
             st.pyplot(wordcloud_fig)
             st.info("☁️ **What this shows:** Word cloud displays the most frequently used words in all posts. Larger words appear more often, helping identify common themes and concerns.")
 
+# -------------------------
+# Visuals Pro
+# -------------------------
 elif page == "Visuals Pro" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🎨 VISUALIZATION STUDIO</p>', unsafe_allow_html=True)
     
@@ -731,6 +687,9 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
         )
         st.plotly_chart(fig, use_container_width=True)
 
+# -------------------------
+# Feature Engineering
+# -------------------------
 elif page == "Engineer" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">⚙️ FEATURE ENGINEERING</p>', unsafe_allow_html=True)
     
@@ -757,6 +716,9 @@ elif page == "Engineer" and st.session_state.data_loaded:
             st.session_state.processed_data = df
             st.success("✅ Engagement categories created!")
 
+# -------------------------
+# AI Models (tab for training classic ML on numeric features)
+# -------------------------
 elif page == "AI Models" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🤖 AI MODEL TRAINING</p>', unsafe_allow_html=True)
     
@@ -906,6 +868,9 @@ elif page == "AI Models" and st.session_state.data_loaded:
         else:
             st.warning("Train models first in the Train tab!")
 
+# -------------------------
+# Predict page (uses the new transformer classifier)
+# -------------------------
 elif page == "Predict" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🔮 AI PREDICTION ENGINE</p>', unsafe_allow_html=True)
     
@@ -917,7 +882,7 @@ elif page == "Predict" and st.session_state.data_loaded:
         text_input = st.text_area("Post Content", 
                                    "Type or paste the social media post here...", 
                                    height=200,
-                                   help="Enter any text - the AI will use transformer-based semantic understanding")
+                                   help="Enter any text - the AI will use a real transformer suicidality classifier")
         
         st.markdown("""
         **💡 Try these examples:**
@@ -930,24 +895,23 @@ elif page == "Predict" and st.session_state.data_loaded:
     with col2:
         st.markdown("### ⚙️ About the Model")
         st.info("""
-        🧠 **Transformer-Based**
-        - Uses Sentence-BERT embeddings
-        - Understands semantic meaning
-        - Not keyword-dependent
-        - Context-aware classification
+        🧠 **Transformer-Based (DistilBERT)**
+        - Uses a model fine-tuned for suicidality detection
+        - Context-aware classification (not keyword-based)
+        - Produces Low / Medium / High risk with probabilities
         """)
-
+    
     if st.button("🎯 ANALYZE RISK", use_container_width=True, type="primary"):
         if len(text_input.strip()) < 5:
             st.warning("⚠️ Please enter at least 5 characters")
         else:
-            with st.spinner("🤖 AI analyzing with transformers..."):
+            with st.spinner("🤖 AI analyzing with transformer model..."):
                 progress = st.progress(0)
                 for i in range(100):
                     time.sleep(0.01)
                     progress.progress(i + 1)
                 
-                result = analyze_mental_health_risk_transformer(text_input)
+                result = analyze_with_transformer(text_input)
                 progress.empty()
                 
                 risk_level = result['risk_level']
@@ -1005,9 +969,8 @@ elif page == "Predict" and st.session_state.data_loaded:
                     col1, col2, col3, col4 = st.columns(4)
                     col1.metric("Risk Score", f"{risk_score}/100")
                     col2.metric("Sentiment", f"{result['sentiment']:.2f}")
-                    if 'high_similarity' in result:
-                        col3.metric("High Sim", f"{result['high_similarity']:.2f}")
-                        col4.metric("Med Sim", f"{result['medium_similarity']:.2f}")
+                    col3.metric("High Prob", f"{result.get('high_similarity', 0):.2f}")
+                    col4.metric("Med Prob", f"{result.get('medium_similarity', 0):.2f}")
                     
                     st.markdown("**All Factors:**")
                     for factor in detected_factors:
@@ -1056,6 +1019,9 @@ elif page == "Predict" and st.session_state.data_loaded:
                     </div>
                     """, unsafe_allow_html=True)
 
+# -------------------------
+# Docs
+# -------------------------
 elif page == "Docs":
     st.markdown('<p class="main-header">📚 DOCUMENTATION</p>', unsafe_allow_html=True)
     
@@ -1066,18 +1032,10 @@ elif page == "Docs":
         ## 🎯 Project Overview
         
         **MindGuard Analytics** is an AI-powered mental health risk assessment system using:
-        - 🧠 **Transformer-based NLP** (Sentence-BERT)
+        - 🧠 **Transformer-based NLP** (DistilBERT suicidality classifier)
         - 📊 **Semantic understanding** (not keyword matching)
         - 🎯 **Multi-class classification** (Low/Medium/High)
         - 💡 **Context-aware** analysis
-        
-        ### 🌟 Key Innovation
-        Unlike traditional keyword-matching systems, MindGuard uses **sentence embeddings** to understand
-        the semantic meaning of text, allowing it to:
-        - Detect suicidal ideation even without explicit keywords
-        - Understand context and nuance
-        - Generalize to diverse language patterns
-        - Reduce false negatives
         """)
     
     with doc_tabs[1]:
@@ -1085,85 +1043,55 @@ elif page == "Docs":
         ## ✨ Features
         
         ### 🔮 Prediction Engine
-        - **Transformer-based**: Uses Sentence-BERT for semantic understanding
-        - **Semantic similarity**: Compares input to reference examples
-        - **Multi-class**: Low, Medium, High risk classification
+        - **Transformer-based**: DistilBERT suicidality model
+        - **Contextual classification**: Low/Medium/High
         - **Confidence scores**: Probability distribution across classes
         
         ### 📊 Visualization
-        - 13+ interactive charts with explanations
+        - Many interactive charts with explanations
         - Correlation analysis
         - Time-series patterns
         - Risk distribution
         
         ### 🤖 Machine Learning
-        - Random Forest, Gradient Boosting, Logistic Regression
+        - Random Forest, Gradient Boosting, Logistic Regression (for numeric-features experiments)
         - Model comparison and tuning
-        - Performance metrics
-        - Confusion matrices
         """)
     
     with doc_tabs[2]:
         st.markdown("""
         ## 🧠 Methodology
         
-        ### Transformer-Based Analysis
+        **Prediction**
+        - Model: DistilBERT fine-tuned for suicidality detection
+        - Input → tokenizer → model → softmax probabilities
+        - Map model outputs to Low / Medium / High risk in the app
+        - Sentiment used as an auxiliary feature for safer unrelated detection
         
-        **1. Sentence Embedding**
-        - Uses Sentence-BERT (all-MiniLM-L6-v2)
-        - Converts text to 384-dimensional vectors
-        - Captures semantic meaning
-        
-        **2. Reference Examples**
-        - High risk: multiple examples of suicidal ideation
-        - Medium risk: diverse distress statements
-        - Low risk: positive/neutral examples
-        
-        **3. Cosine Similarity**
-        - Compares input embedding to each reference category
-        - Calculates similarity scores (0-1)
-        - Combines with sentiment analysis
-        
-        **4. Classification**
-        - Uses similarity scores + sentiment
-        - Determines risk level (High/Medium/Low)
-        - Generates confidence and probabilities
+        **Why it generalizes**
+        - Fine-tuned models learn semantic patterns in language and emotional cues
+        - They do not rely on simple keyword matching
         """)
     
     with doc_tabs[3]:
         st.markdown("""
         ## 📖 Usage Guide
         
-        ### 1. Load Data
-        Click **"LOAD DEMO DATA"** on the Home page
+        1. Click **LOAD DEMO DATA** on Home to populate dashboard datasets (demo)
+        2. Explore Data Hub, Visuals, and Engineer pages for feature work
+        3. Go to **AI Models** to run numeric-feature ML experiments
+        4. Use **Predict** to classify any input text for suicide risk
         
-        ### 2. Explore Data
-        - **Data Hub**: View and clean data
-        - **Explorer**: Analyze distributions
-        - **Visuals Pro**: Advanced visualizations
-        
-        ### 3. Train Models (Optional)
-        - Go to **AI Models** page
-        - Select models to train
-        - View performance metrics
-        
-        ### 4. Make Predictions
-        - Go to **Predict** page
-        - Enter text (any language about mental health)
-        - Click **ANALYZE RISK**
-        - View results with semantic similarity scores
-        
-        ### Example Inputs
-        - ✅ "I am skeptical whether to live or not. I hate this life." → Medium-High
-        - ✅ "I don't want to live" → High
-        - ✅ "The weather is good" → Low (unrelated)
-        - ✅ "I feel empty and worthless" → High
+        **Tips**
+        - For best predictions, keep input text reasonably descriptive (a short sentence is fine)
+        - If transformers/torch are not installed, the Predict page will fall back to a safe Medium prediction and show an install error
         """)
+
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; padding: 20px; color: #1a1a1a;'>
     <p>🛡️ <b>MindGuard Analytics</b> | Transformer-Based Mental Health Risk Assessment</p>
-    <p style='font-size: 0.9rem;'>Using Sentence-BERT for Semantic Understanding | Not keyword-dependent</p>
+    <p style='font-size: 0.9rem;'>Using DistilBERT suicidality classifier for contextual understanding</p>
 </div>
 """, unsafe_allow_html=True)
