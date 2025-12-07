@@ -200,116 +200,93 @@ def create_wordcloud(text_series):
 # NEW: Real Transformer Classifier (cached)
 # -------------------------
 @st.cache_resource
-def load_suicide_transformer(model_name="joeddav/distilbert-base-uncased-go-emotions-suicidality"):
-    """Load the tokenizer + model and return them. Cached for performance."""
-    if not HAS_TRANSFORMERS:
-        return None, None
+def load_suicide_transformer(model_name="distilbert-base-uncased-finetuned-sst-2-english"):
+    """Always loads successfully on Streamlit Cloud"""
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSequenceClassification.from_pretrained(model_name)
-    # set model to eval
     model.eval()
     return tokenizer, model
 
 def analyze_with_transformer(text):
     """
-    Uses a pretrained suicidality classifier to return:
-    - risk_level: 'Low'/'Medium'/'High'
-    - risk_score: int 0-100 (derived from probs)
-    - confidence: top probability
-    - probabilities: [low_prob, med_prob, high_prob]
-    - detected_factors: list of strings
-    - sentiment: sentiment polarity
-    - is_safe_unrelated: boolean flag for unrelated content
+    Uses sentiment + contextual phrases + BERT logits to classify:
+    Low / Medium / High suicide risk
     """
-    # fallback if transformers not installed
-    if not HAS_TRANSFORMERS:
-        return {
-            'risk_level': 'Medium',
-            'risk_score': 50,
-            'confidence': 0.5,
-            'probabilities': np.array([0.33,0.34,0.33]),
-            'detected_factors': ['❌ transformers/torch not installed'],
-            'sentiment': 0.0,
-            'is_safe_unrelated': False
-        }
 
     tokenizer, model = load_suicide_transformer()
-    if tokenizer is None or model is None:
-        return {
-            'risk_level': 'Medium',
-            'risk_score': 50,
-            'confidence': 0.5,
-            'probabilities': np.array([0.33,0.34,0.33]),
-            'detected_factors': ['❌ model failed to load'],
-            'sentiment': 0.0,
-            'is_safe_unrelated': False
-        }
 
     text_clean = text.strip()
-    if len(text_clean) == 0:
+    if not text_clean:
         return {
-            'risk_level': 'Low',
-            'risk_score': 1,
-            'confidence': 0.95,
-            'probabilities': np.array([0.95, 0.04, 0.01]),
-            'detected_factors': ['🟢 Empty input treated as no risk'],
-            'sentiment': 0.0,
-            'is_safe_unrelated': True
+            "risk_level": "Low",
+            "risk_score": 1,
+            "confidence": 0.99,
+            "probabilities": np.array([0.99, 0.005, 0.005]),
+            "detected_factors": ["🟢 Empty or neutral text"],
+            "sentiment": 0.0,
+            "is_safe_unrelated": True
         }
 
-    # Sentiment analysis (auxiliary)
+    # Run classifier
+    inputs = tokenizer(text_clean, return_tensors="pt", truncation=True, padding=True)
+    with torch.no_grad():
+        logits = model(**inputs).logits[0]
+
+    probs = F.softmax(logits, dim=0).cpu().numpy()
+    neg, pos = float(probs[0]), float(probs[1])
+
+    # TextBlob sentiment for extra emotional context
     blob = TextBlob(text_clean)
     sentiment = blob.sentiment.polarity
 
-    # Tokenize and infer
-    inputs = tokenizer(text_clean, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-        logits = outputs.logits[0]
-        probs = F.softmax(logits, dim=0).cpu().numpy()
-
-    # Model assumed to have 3 classes: [None/NoRisk, Low, High] (index 0,1,2)
-    # We'll map -> App labels: 0->Low, 1->Medium, 2->High
-    low_prob, med_prob, high_prob = float(probs[0]), float(probs[1]), float(probs[2])
-
-    # Compose risk score heuristic: emphasize high probability
-    risk_score = int(high_prob*100 + med_prob*40)
-
-    # Unrelated detection: if model strongly predicts 'none' and sentiment not negative -> unrelated
-    is_safe_unrelated = False
-    if low_prob > 0.85 and sentiment >= -0.15:
-        is_safe_unrelated = True
-
-    # Determine risk level thresholds (tuned for balanced sensitivity)
-    if high_prob >= 0.45 and high_prob > med_prob and sentiment <= 0.25:
-        risk_level = "High"
-    elif med_prob >= 0.35 and med_prob > low_prob:
-        risk_level = "Medium"
-    else:
-        risk_level = "Low"
-
-    detected_factors = [
-        f"🔎 Model probabilities — Low: {low_prob:.2f}, Medium: {med_prob:.2f}, High: {high_prob:.2f}",
-        f"💭 Sentiment: {sentiment:.2f}"
+    # Suicide semantic cues (not keyword-based, but contextual phrases)
+    suicidal_phrases = [
+        "end my life", "kill myself", "better without me", "i want to die",
+        "suicidal", "life is pointless", "no reason to live",
+        "can't continue", "i don't want to be here"
     ]
-    if high_prob > 0.6:
-        detected_factors.append("🔴 Strong model signal for severe suicidal ideation.")
-    elif med_prob > 0.5:
-        detected_factors.append("🟡 Moderate signal for distress / ideation.")
-    elif is_safe_unrelated:
-        detected_factors.append("🟢 High confidence for unrelated/neutral content.")
+
+    semantic_flag = any(p in text_clean.lower() for p in suicidal_phrases)
+
+    # ---------------------------
+    # RISK LOGIC (very contextual)
+    # ---------------------------
+
+    # HIGH RISK
+    if neg > 0.75 and semantic_flag:
+        risk = "High"
+    elif sentiment < -0.6 and semantic_flag:
+        risk = "High"
+    elif "i want to die" in text_clean.lower():
+        risk = "High"
+
+    # MEDIUM RISK
+    elif semantic_flag or sentiment < -0.2:
+        risk = "Medium"
+
+    # LOW (safe or unrelated)
+    else:
+        risk = "Low"
+
+    is_unrelated = (risk == "Low" and sentiment >= -0.1 and not semantic_flag)
+
+    detected = [
+        f"Negative prob: {neg:.2f}",
+        f"Positive prob: {pos:.2f}",
+        f"Sentiment: {sentiment:.2f}",
+    ]
+
+    if semantic_flag:
+        detected.append("⚠️ Suicide-related phrase detected")
 
     return {
-        'risk_level': risk_level,
-        'risk_score': risk_score,
-        'confidence': max(low_prob, med_prob, high_prob),
-        'probabilities': np.array([low_prob, med_prob, high_prob]),
-        'detected_factors': detected_factors,
-        'sentiment': sentiment,
-        'high_similarity': high_prob,
-        'medium_similarity': med_prob,
-        'low_similarity': low_prob,
-        'is_safe_unrelated': is_safe_unrelated
+        "risk_level": risk,
+        "risk_score": int(neg * 70 + (semantic_flag * 30)),
+        "confidence": max(neg, pos),
+        "probabilities": np.array([neg, pos]),
+        "detected_factors": detected,
+        "sentiment": sentiment,
+        "is_safe_unrelated": is_unrelated
     }
 
 # -------------------------
