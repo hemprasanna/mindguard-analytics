@@ -39,7 +39,7 @@ st.markdown("""
     }
     
     .stApp {
-        background: linear-gradient(-45deg, #e3f2fd, #f3e5f5, #e8f5e9, #fff3e0, #fce4ec);
+        background: linear-gradient(-45deg, #e0f2f7, #f0f4f8, #e8f5e9, #fff9e6, #fce4ec);
         background-size: 400% 400%;
         animation: gradientShift 20s ease infinite;
         background-attachment: fixed;
@@ -83,7 +83,7 @@ st.markdown("""
     
     /* Vibrant but readable sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+        background: linear-gradient(180deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%) !important;
         box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     }
     
@@ -115,20 +115,20 @@ st.markdown("""
     
     /* Buttons with excellent contrast */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%) !important;
         color: white !important;
         border: none !important;
         padding: 12px 28px !important;
         border-radius: 25px !important;
         font-weight: 700 !important;
         font-size: 1rem !important;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+        box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3) !important;
         transition: all 0.3s !important;
     }
     
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+        box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4) !important;
     }
     
     /* Colorful tabs with dark text */
@@ -405,6 +405,31 @@ def analyze_mental_health_risk(text):
     risk_score = 50
     detected_factors = []
     
+    # Check if text is completely unrelated to mental health
+    mental_health_keywords = [
+        'die', 'death', 'suicide', 'kill', 'end', 'life', 'hopeless', 'worthless',
+        'burden', 'alone', 'sad', 'depressed', 'anxious', 'scared', 'worried',
+        'happy', 'grateful', 'blessed', 'hope', 'better', 'worse', 'feel',
+        'hurt', 'pain', 'suffer', 'struggle', 'cope', 'help', 'therapy'
+    ]
+    
+    has_mental_health_context = any(keyword in text_lower for keyword in mental_health_keywords)
+    
+    # If completely unrelated AND positive/neutral sentiment
+    if not has_mental_health_context and sentiment >= -0.1:
+        return {
+            'risk_level': 'Low',
+            'risk_score': 10,
+            'confidence': 0.90,
+            'probabilities': np.array([0.90, 0.08, 0.02]),
+            'detected_factors': ['🟢 Content unrelated to mental health concerns'],
+            'sentiment': sentiment,
+            'subjectivity': subjectivity,
+            'word_count': text_len,
+            'protection_count': 0,
+            'is_safe_unrelated': True
+        }
+    
     # Suicidal intent (+40)
     suicidal_intent = {
         'want to die': 40, 'going to die': 40, 'kill myself': 45, 
@@ -549,7 +574,8 @@ def analyze_mental_health_risk(text):
         'sentiment': sentiment,
         'subjectivity': subjectivity,
         'word_count': text_len,
-        'protection_count': protection_count
+        'protection_count': protection_count,
+        'is_safe_unrelated': False
     }
 
 # SIDEBAR
@@ -1308,6 +1334,11 @@ elif page == "Predict" and st.session_state.data_loaded:
                 confidence = result['confidence']
                 proba = result['probabilities']
                 detected_factors = result['detected_factors']
+                is_safe_unrelated = result.get('is_safe_unrelated', False)
+                
+                # Special handling for safe unrelated content
+                if is_safe_unrelated:
+                    st.success("✅ **SAFE CONTENT DETECTED** - This text does not contain any mental health concerns or life-threatening language.")
                 
                 if risk_level == "High":
                     color, icon, message = "#ff6b6b", "🔴", "HIGH RISK - IMMEDIATE ATTENTION"
