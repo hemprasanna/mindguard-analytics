@@ -206,45 +206,79 @@ def analyze_mental_health_risk_transformer(text):
         from sklearn.metrics.pairwise import cosine_similarity
         
         # Load pre-trained sentence transformer
-        # Using all-MiniLM-L6-v2 (fast, accurate, good for semantic similarity)
         model = SentenceTransformer('all-MiniLM-L6-v2')
         
         # Get sentence embedding
         text_embedding = model.encode([text])[0]
+        text_lower = text.lower().strip()
+        
+        # Get sentiment first
+        blob = TextBlob(text)
+        sentiment = blob.sentiment.polarity
+        
+        # CRITICAL: Check for POSITIVE life-affirming statements FIRST
+        # These should NEVER be high risk
+        positive_life_phrases = [
+            'want to live', 'want to survive', 'choosing life', 'choosing to live',
+            'trying to live', 'fighting to live', 'reasons to live', 'worth living',
+            'love life', 'enjoy life', 'grateful to be alive', 'glad to be alive',
+            'happy to be alive', 'life is worth', 'life is good', 'life is beautiful'
+        ]
+        
+        has_positive_life = any(phrase in text_lower for phrase in positive_life_phrases)
+        
+        # If positive life statement OR very positive sentiment, return LOW risk immediately
+        if has_positive_life or sentiment > 0.4:
+            return {
+                'risk_level': 'Low',
+                'risk_score': 5,
+                'confidence': 0.92,
+                'probabilities': np.array([0.92, 0.06, 0.02]),
+                'detected_factors': ['🟢 Positive life-affirming content detected', 
+                                   f'💭 Positive sentiment: {sentiment:.2f}'],
+                'sentiment': sentiment,
+                'high_similarity': 0.1,
+                'medium_similarity': 0.1,
+                'low_similarity': 0.8,
+                'is_safe_unrelated': False
+            }
         
         # Define reference embeddings for each risk category
         high_risk_examples = [
             "I want to die and end my life",
-            "I cannot live anymore, nobody cares",
-            "I hate this life and want to disappear",
+            "I cannot live anymore, nobody cares about me",
+            "I am skeptical whether to live or not, I hate this life",
             "Everyone would be better off without me",
-            "I am skeptical whether to live or not",
             "I don't want to live anymore",
-            "Life is not worth living",
-            "I feel empty and worthless",
-            "Nothing makes sense anymore",
-            "I wish I could just disappear forever"
+            "I wish I could just disappear forever",
+            "Life is not worth living anymore",
+            "I feel empty and completely worthless",
+            "Nothing makes sense, I want it to end",
+            "I hate my life and want to die"
         ]
         
         medium_risk_examples = [
-            "I am skeptical about continuing",
-            "I hate this life sometimes",
-            "Feeling really down and hopeless",
-            "Everything feels meaningless",
-            "I don't know if I can go on",
-            "Feeling very alone and sad",
-            "Nothing brings me joy anymore",
-            "I feel trapped and helpless"
+            "I am skeptical about continuing with life",
+            "I hate this life sometimes, it's so hard",
+            "Feeling really down and hopeless today",
+            "Everything feels meaningless and empty",
+            "I don't know if I can go on like this",
+            "Feeling very alone and completely sad",
+            "Nothing brings me joy anymore, everything is gray",
+            "I feel trapped and completely helpless"
         ]
         
         low_risk_examples = [
-            "Having a good day today",
-            "Feeling grateful for my family",
-            "The weather is beautiful",
-            "I love spending time with friends",
-            "Work was productive today",
-            "Enjoyed my morning coffee",
-            "Looking forward to the weekend"
+            "Having a good day today, feeling better",
+            "Feeling grateful for my family and friends",
+            "The weather is beautiful and sunny",
+            "I love spending time with my friends",
+            "Work was productive and rewarding today",
+            "Enjoyed my morning coffee at the cafe",
+            "Looking forward to the weekend trip",
+            "I want to live more and enjoy life",
+            "Life is worth living and beautiful",
+            "I'm choosing to live and be happy"
         ]
         
         # Get embeddings for reference examples
@@ -257,24 +291,19 @@ def analyze_mental_health_risk_transformer(text):
         medium_similarity = cosine_similarity([text_embedding], medium_risk_embeddings).max()
         low_similarity = cosine_similarity([text_embedding], low_risk_embeddings).max()
         
-        # Get sentiment
-        blob = TextBlob(text)
-        sentiment = blob.sentiment.polarity
-        
         # Combine semantic similarity with sentiment
-        # High negative sentiment increases risk
         sentiment_adjustment = 0
         if sentiment < -0.3:
             sentiment_adjustment = abs(sentiment) * 15
         elif sentiment > 0.3:
-            sentiment_adjustment = -sentiment * 20
+            sentiment_adjustment = -sentiment * 25  # Positive sentiment strongly reduces risk
         
         # Calculate risk scores (0-100)
         high_score = (high_similarity * 100) + sentiment_adjustment
         medium_score = (medium_similarity * 100)
         low_score = (low_similarity * 100) - sentiment_adjustment
         
-        # Normalize to ensure they sum properly
+        # Normalize
         total = high_score + medium_score + low_score
         if total > 0:
             high_prob = high_score / total
@@ -283,30 +312,21 @@ def analyze_mental_health_risk_transformer(text):
         else:
             high_prob = medium_prob = low_prob = 0.33
         
-        # Determine risk level based on highest probability
-        probabilities = {'High': high_prob, 'Medium': medium_prob, 'Low': low_prob}
-        risk_level = max(probabilities, key=probabilities.get)
-        
-        # Calculate final risk score (0-100)
+        # Calculate final risk score
         risk_score = (high_prob * 100) + (medium_prob * 50) + (low_prob * 0)
         
-        # Adjust thresholds to be more sensitive
-        if risk_score >= 60 or high_similarity > 0.5:
-            risk_level = "High"
-        elif risk_score >= 35 or medium_similarity > 0.45:
-            risk_level = "Medium"
-        else:
-            risk_level = "Low"
-        
-        # Check if completely unrelated
+        # IMPORTANT: Check if completely unrelated to mental health
+        # All similarities low AND neutral/positive sentiment
         max_similarity = max(high_similarity, medium_similarity, low_similarity)
-        if max_similarity < 0.3 and sentiment > -0.2:
+        
+        if max_similarity < 0.35 and sentiment >= -0.2:
             return {
                 'risk_level': 'Low',
                 'risk_score': 5,
                 'confidence': 0.95,
                 'probabilities': np.array([0.95, 0.04, 0.01]),
-                'detected_factors': ['🟢 No mental health or suicide-related content detected'],
+                'detected_factors': ['🟢 No suicide intent detected in this message',
+                                   '✅ Content appears unrelated to mental health crisis'],
                 'sentiment': sentiment,
                 'high_similarity': high_similarity,
                 'medium_similarity': medium_similarity,
@@ -314,17 +334,29 @@ def analyze_mental_health_risk_transformer(text):
                 'is_safe_unrelated': True
             }
         
+        # Determine risk level with adjusted thresholds
+        # IMPORTANT: Positive sentiment should prevent HIGH classification
+        if risk_score >= 65 and high_similarity > 0.55 and sentiment < 0:
+            risk_level = "High"
+        elif risk_score >= 40 and medium_similarity > 0.45:
+            risk_level = "Medium"
+        else:
+            risk_level = "Low"
+        
         # Build detected factors
         detected_factors = []
-        detected_factors.append(f"📊 Semantic similarity to high-risk: {high_similarity:.2f}")
-        detected_factors.append(f"📊 Semantic similarity to medium-risk: {medium_similarity:.2f}")
-        detected_factors.append(f"📊 Semantic similarity to low-risk: {low_similarity:.2f}")
-        detected_factors.append(f"💭 Sentiment score: {sentiment:.2f}")
+        detected_factors.append(f"📊 High-risk similarity: {high_similarity:.2f}")
+        detected_factors.append(f"📊 Medium-risk similarity: {medium_similarity:.2f}")
+        detected_factors.append(f"📊 Low-risk similarity: {low_similarity:.2f}")
+        detected_factors.append(f"💭 Sentiment: {sentiment:.2f}")
         
-        if high_similarity > 0.4:
+        if high_similarity > 0.5 and sentiment < 0:
             detected_factors.append("🔴 Strong semantic match to suicidal ideation")
-        elif medium_similarity > 0.4:
-            detected_factors.append("🟡 Moderate semantic match to mental health concerns")
+        elif medium_similarity > 0.45:
+            detected_factors.append("🟡 Moderate match to mental health concerns")
+        
+        if sentiment > 0.3:
+            detected_factors.append("🟢 Positive emotional tone detected")
         
         confidence = max(high_prob, medium_prob, low_prob)
         
@@ -342,7 +374,6 @@ def analyze_mental_health_risk_transformer(text):
         }
         
     except ImportError:
-        # Fallback if sentence-transformers not installed
         st.error("⚠️ Sentence transformers not installed. Install with: pip install sentence-transformers")
         return {
             'risk_level': 'Medium',
@@ -945,7 +976,7 @@ elif page == "Predict" and st.session_state.data_loaded:
                 
                 # Special handling for safe unrelated content
                 if is_safe_unrelated:
-                    st.success("✅ **NO HARM DETECTED** - This text contains no suicide-related content or mental health crisis indicators. The content appears completely safe and unrelated to self-harm.")
+                    st.success("✅ **NO SUICIDE INTENT DETECTED** - This message does not contain any suicide-related content or mental health crisis indicators. The content appears safe and unrelated to self-harm.")
                 
                 if risk_level == "High":
                     color, icon, message = "#ff6b6b", "🔴", "HIGH RISK - IMMEDIATE ATTENTION"
