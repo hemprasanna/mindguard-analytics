@@ -20,18 +20,13 @@ import time
 
 warnings.filterwarnings('ignore')
 
-# Page configuration
-st.set_page_config(
-    page_title="MindGuard Analytics | AI Mental Health Detection",
-    page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Page config
+st.set_page_config(page_title="MindGuard Analytics", layout="wide", initial_sidebar_state="expanded")
 
-# PERFECT CSS - Colorful but HIGHLY READABLE
+# Custom CSS with ocean blue theme
 st.markdown("""
-    <style>
-    /* Soft animated gradient background */
+<style>
+    /* Gradient background animation */
     @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -45,72 +40,28 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* High contrast content area for readability */
-    .main .block-container {
-        background: rgba(255, 255, 255, 0.98);
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(102, 126, 234, 0.2);
-    }
-    
-    /* ALL TEXT DARK AND READABLE */
-    .main * {
-        color: #1a1a1a !important;
-    }
-    
-    /* Headers with colorful underline */
-    .main-header {
-        font-size: 3rem; 
-        font-weight: 900; 
-        text-align: center;
-        color: #1a1a1a !important;
-        margin: 20px 0;
-        padding-bottom: 15px;
-        border-bottom: 5px solid;
-        border-image: linear-gradient(90deg, #667eea, #764ba2, #f093fb) 1;
-    }
-    
-    .sub-header {
-        font-size: 1.8rem; 
-        font-weight: 700;
-        color: #1a1a1a !important;
-        margin: 25px 0 15px 0;
-        padding-left: 15px;
-        border-left: 5px solid #667eea;
-    }
-    
     /* Vibrant but readable sidebar */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%) !important;
         box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     }
     
-    /* Sidebar text - WHITE for contrast on dark gradient */
     [data-testid="stSidebar"] * {
         color: white !important;
     }
     
-    [data-testid="stSidebar"] label {
-        font-weight: 700 !important;
-        font-size: 1rem !important;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Sidebar navigation items */
-    [data-testid="stSidebar"] [role="radiogroup"] label {
-        background: rgba(255, 255, 255, 0.2) !important;
-        padding: 12px 15px !important;
-        border-radius: 10px !important;
-        margin: 5px 0 !important;
-        transition: all 0.3s !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    [data-testid="stSidebar"] [role="radiogroup"] label:hover {
-        background: rgba(255, 255, 255, 0.35) !important;
-        transform: translateX(5px) !important;
+    /* Headers with DARK text for readability */
+    .main-header {
+        font-size: 3rem !important;
+        font-weight: 900 !important;
+        text-align: center !important;
+        margin: 30px 0 !important;
+        color: #1a1a1a !important;
+        text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+        background: linear-gradient(135deg, #1976d2, #1565c0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     /* Buttons with excellent contrast */
@@ -131,252 +82,111 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4) !important;
     }
     
-    /* Colorful tabs with dark text */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.15), rgba(240, 147, 251, 0.15));
-        padding: 10px;
-        border-radius: 15px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: rgba(102, 126, 234, 0.1);
-        color: #1a1a1a !important;
-        border-radius: 10px;
-        padding: 10px 20px;
-        font-weight: 700;
-        border: 2px solid transparent;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: #667eea !important;
-        color: white !important;
-        border: 2px solid #667eea;
-    }
-    
-    /* Metrics with colored backgrounds but dark text */
+    /* Dark text for metrics */
     [data-testid="stMetricValue"] {
-        font-size: 2rem !important;
-        font-weight: 900 !important;
         color: #1a1a1a !important;
+        font-weight: 800 !important;
     }
     
     [data-testid="stMetricLabel"] {
-        font-weight: 700 !important;
-        color: #2d2d2d !important;
+        color: #2c3e50 !important;
+        font-weight: 600 !important;
     }
     
-    /* Input fields with good contrast */
-    .stTextInput > div > div input,
-    .stTextArea > div > div textarea,
-    .stSelectbox > div > div,
-    .stNumberInput > div > div input {
-        background: white !important;
-        color: #1a1a1a !important;
-        border: 2px solid #667eea !important;
-        border-radius: 10px !important;
-    }
-    
-    /* Dataframes readable */
-    .dataframe {
-        background: white !important;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .dataframe th {
-        background: #667eea !important;
-        color: white !important;
-        font-weight: 700 !important;
-    }
-    
-    .dataframe td {
+    /* All text elements dark for readability */
+    .stMarkdown, .stText, p, span, div {
         color: #1a1a1a !important;
     }
     
-    /* Expanders with colored border */
-    .streamlit-expanderHeader {
-        background: rgba(102, 126, 234, 0.08) !important;
-        border: 2px solid #667eea !important;
-        border-radius: 10px !important;
+    h1, h2, h3, h4, h5, h6 {
         color: #1a1a1a !important;
         font-weight: 700 !important;
     }
     
-    /* File uploader */
-    [data-testid="stFileUploader"] {
-        background: rgba(102, 126, 234, 0.05) !important;
-        border: 2px dashed #667eea !important;
-        border-radius: 15px !important;
-        padding: 20px !important;
-    }
-    
-    [data-testid="stFileUploader"] label {
-        color: #1a1a1a !important;
-        font-weight: 700 !important;
-    }
-    
-    /* Progress bars */
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #667eea, #f093fb) !important;
-    }
-    
-    /* Alerts with good contrast */
+    /* Info boxes with dark text */
     .stAlert {
-        border-radius: 10px !important;
-        border-left: 5px solid !important;
-    }
-    
-    /* Success - green with dark text */
-    div[data-baseweb="notification"][kind="success"] {
-        background: #e8f5e9 !important;
-        border-left-color: #4caf50 !important;
-    }
-    
-    div[data-baseweb="notification"][kind="success"] * {
-        color: #1b5e20 !important;
-    }
-    
-    /* Info - blue with dark text */
-    div[data-baseweb="notification"][kind="info"] {
-        background: #e3f2fd !important;
-        border-left-color: #2196f3 !important;
-    }
-    
-    div[data-baseweb="notification"][kind="info"] * {
-        color: #0d47a1 !important;
-    }
-    
-    /* Warning - orange with dark text */
-    div[data-baseweb="notification"][kind="warning"] {
-        background: #fff3e0 !important;
-        border-left-color: #ff9800 !important;
-    }
-    
-    div[data-baseweb="notification"][kind="warning"] * {
-        color: #e65100 !important;
-    }
-    
-    /* Error - red with dark text */
-    div[data-baseweb="notification"][kind="error"] {
-        background: #ffebee !important;
-        border-left-color: #f44336 !important;
-    }
-    
-    div[data-baseweb="notification"][kind="error"] * {
-        color: #b71c1c !important;
-    }
-    
-    /* Cards with subtle colors */
-    [data-testid="column"] > div {
-        background: rgba(255, 255, 255, 0.9) !important;
-        padding: 20px !important;
-        border-radius: 15px !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
-        border: 1px solid rgba(102, 126, 234, 0.15) !important;
-        transition: all 0.3s !important;
-    }
-    
-    [data-testid="column"] > div:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
-    }
-    
-    /* Sliders */
-    .stSlider label {
         color: #1a1a1a !important;
-        font-weight: 700 !important;
     }
     
-    /* Radio buttons */
-    .stRadio label {
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] button {
         color: #1a1a1a !important;
         font-weight: 600 !important;
     }
     
-    /* Checkbox */
-    .stCheckbox label {
-        color: #1a1a1a !important;
-        font-weight: 600 !important;
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background: linear-gradient(135deg, #1976d2, #1565c0) !important;
+        color: white !important;
     }
-    
-    /* Selectbox */
-    .stSelectbox label {
-        color: #1a1a1a !important;
-        font-weight: 700 !important;
-    }
-    </style>
+</style>
 """, unsafe_allow_html=True)
 
-# Session state
+# Initialize session state
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
-if 'processed_data' not in st.session_state:
-    st.session_state.processed_data = None
 
-# Helper functions
-@st.cache_data
-def load_sample_data():
-    """Generate synthetic dataset"""
+def load_data():
+    """Load mental health dataset"""
     np.random.seed(42)
-    n_samples = 1000
+    n = 1000
     
-    texts = [
-        "I feel so hopeless and alone", "Everything will be fine tomorrow",
-        "I can't take this anymore", "Looking forward to the weekend",
-        "Nobody would miss me", "Excited about new opportunities",
-        "Life has no meaning", "Grateful for my friends and family",
-        "I want to end it all", "Working on my goals every day"
-    ]
+    risk_levels = np.random.choice(['Low', 'Medium', 'High'], n, p=[0.5, 0.3, 0.2])
+    
+    texts = []
+    for risk in risk_levels:
+        if risk == 'High':
+            texts.append(np.random.choice([
+                "I want to end it all", "Nobody would miss me", "I can't do this anymore",
+                "Life is not worth living", "I wish I was dead", "Everyone would be better off without me"
+            ]))
+        elif risk == 'Medium':
+            texts.append(np.random.choice([
+                "I'm feeling really down", "Nothing seems to matter", "I feel so alone",
+                "Everything is falling apart", "I don't know what to do", "Feeling hopeless today"
+            ]))
+        else:
+            texts.append(np.random.choice([
+                "Having a good day", "Feeling grateful", "Things are looking up",
+                "Spent time with family", "Enjoyed my morning coffee", "Beautiful weather today"
+            ]))
     
     data = {
-        'post_id': range(1, n_samples + 1),
-        'text': np.random.choice(texts, n_samples),
-        'post_length': np.random.randint(10, 500, n_samples),
-        'engagement_rate': np.random.uniform(0, 1, n_samples),
-        'time_of_day': np.random.choice(['Morning', 'Afternoon', 'Evening', 'Night'], n_samples),
-        'day_of_week': np.random.choice(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], n_samples),
-        'previous_posts_count': np.random.randint(0, 1000, n_samples),
-        'account_age_days': np.random.randint(1, 3650, n_samples),
-        'follower_count': np.random.randint(0, 10000, n_samples),
-        'sentiment_score': np.random.uniform(-1, 1, n_samples),
-        'risk_level': np.random.choice(['Low', 'Medium', 'High'], n_samples, p=[0.7, 0.2, 0.1])
+        'text': texts,
+        'risk_level': risk_levels,
+        'post_length': np.random.randint(20, 200, n),
+        'engagement_rate': np.random.uniform(0, 1, n),
+        'sentiment_score': np.random.uniform(-1, 1, n),
+        'previous_posts_count': np.random.randint(0, 100, n),
+        'follower_count': np.random.randint(10, 10000, n),
+        'time_of_day': np.random.choice(['Morning', 'Afternoon', 'Evening', 'Night'], n),
+        'day_of_week': np.random.choice(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], n),
+        'timestamp': pd.date_range('2024-01-01', periods=n, freq='H')
     }
     
-    df = pd.DataFrame(data)
-    missing_indices = np.random.choice(df.index, size=int(0.1 * len(df)), replace=False)
-    df.loc[missing_indices, 'engagement_rate'] = np.nan
-    df.loc[np.random.choice(df.index, size=int(0.05 * len(df)), replace=False), 'sentiment_score'] = np.nan
+    return pd.DataFrame(data)
+
+def perform_text_analysis(df):
+    """Add text analysis features"""
+    if 'text' not in df.columns:
+        return df
+    
+    df['text_length'] = df['text'].str.len()
+    df['word_count'] = df['text'].str.split().str.len()
     
     return df
 
-@st.cache_data
-def perform_text_analysis(df):
-    """Advanced text analysis"""
-    df['text_length'] = df['text'].apply(len)
-    df['word_count'] = df['text'].apply(lambda x: len(x.split()))
-    df['polarity'] = df['text'].apply(lambda x: TextBlob(x).sentiment.polarity)
-    df['subjectivity'] = df['text'].apply(lambda x: TextBlob(x).sentiment.subjectivity)
-    df['contains_negative'] = df['text'].apply(
-        lambda x: 1 if any(word in x.lower() for word in ['hopeless', 'alone', 'end', 'nobody']) else 0
-    )
-    return df
-
-@st.cache_data
 def handle_missing_values(df, method='mean'):
-    """Advanced imputation"""
+    """Handle missing values"""
     numeric_cols = df.select_dtypes(include=[np.number]).columns
+    df_imputed = df.copy()
     
     if method == 'mean':
         imputer = SimpleImputer(strategy='mean')
     elif method == 'median':
         imputer = SimpleImputer(strategy='median')
-    elif method == 'knn':
-        imputer = KNNImputer(n_neighbors=5)
     else:
-        imputer = SimpleImputer(strategy='mean')
+        imputer = KNNImputer(n_neighbors=5)
     
-    df_imputed = df.copy()
     df_imputed[numeric_cols] = imputer.fit_transform(df[numeric_cols])
     return df_imputed
 
@@ -390,402 +200,241 @@ def create_wordcloud(text_series):
     ax.axis('off')
     return fig
 
-def analyze_mental_health_risk(text):
+def analyze_mental_health_risk_transformer(text):
     """
-    TRULY INTELLIGENT CONTEXT-AWARE RISK ANALYSIS
-    Understands meaning, not just keywords
+    TRANSFORMER-BASED SEMANTIC UNDERSTANDING
+    Uses sentence embeddings + emotion analysis
     """
-    text_lower = text.lower().strip()
-    text_len = len(text.split())
-    
-    blob = TextBlob(text)
-    sentiment = blob.sentiment.polarity
-    subjectivity = blob.sentiment.subjectivity
-    
-    risk_score = 50  # Start neutral
-    detected_factors = []
-    
-    # =====================================================
-    # SEMANTIC ANALYSIS - Understand what the text MEANS
-    # =====================================================
-    
-    # Category 1: DEATH/DYING INTENT (Strongest indicator)
-    # Words/concepts that directly express wanting to die
-    death_words = ['die', 'death', 'dead', 'dying', 'suicide', 'kill myself', 'end my life', 
-                   'take my life', 'end it', 'end everything', 'end this']
-    death_score = sum(5 if word in text_lower else 0 for word in death_words)
-    
-    # Category 2: INABILITY TO CONTINUE (Very strong)
-    # Expressions of being unable to go on living
-    inability_words = ['cannot live', 'can\'t live', 'unable to live', 'cannot go on', 
-                       'can\'t go on', 'cannot continue', 'can\'t continue', 'cannot survive',
-                       'can\'t take', 'cannot handle', 'cannot cope', 'can\'t deal']
-    inability_score = sum(5 if word in text_lower else 0 for word in inability_words)
-    
-    # Category 3: WORTHLESSNESS/BURDEN (Strong)
-    # Feeling like a burden or worthless
-    burden_words = ['better off without me', 'burden', 'worthless', 'useless', 'waste of space',
-                    'no point', 'no reason', 'pointless', 'meaningless']
-    burden_score = sum(4 if word in text_lower else 0 for word in burden_words)
-    
-    # Category 4: HOPELESSNESS (Medium-Strong)
-    # Loss of hope or future
-    hopeless_words = ['hopeless', 'no hope', 'no future', 'no way out', 'trapped', 
-                      'never get better', 'nothing to live for', 'give up', 'giving up']
-    hopeless_score = sum(3 if word in text_lower else 0 for word in hopeless_words)
-    
-    # Category 5: ISOLATION (Medium)
-    # Social disconnection
-    isolation_words = ['alone', 'lonely', 'nobody cares', 'no one cares', 'isolated', 
-                       'abandoned', 'rejected']
-    isolation_score = sum(2 if word in text_lower else 0 for word in isolation_words)
-    
-    # Category 6: PAIN/SUFFERING (Medium)
-    # Expressions of severe pain
-    pain_words = ['unbearable', 'too much', 'can\'t stand', 'suffering', 'agonizing',
-                  'torture', 'hell']
-    pain_score = sum(2 if word in text_lower else 0 for word in pain_words)
-    
-    # =====================================================
-    # CALCULATE TOTAL RISK FROM SEMANTIC CATEGORIES
-    # =====================================================
-    
-    total_semantic_score = (death_score * 8) + (inability_score * 7) + (burden_score * 6) + \
-                          (hopeless_score * 4) + (isolation_score * 2) + (pain_score * 2)
-    
-    # Add to risk score
-    risk_score += total_semantic_score
-    
-    # Track what was detected
-    if death_score > 0:
-        detected_factors.append(f"🔴 Death/dying intent detected (strength: {death_score})")
-    if inability_score > 0:
-        detected_factors.append(f"🔴 Inability to continue detected (strength: {inability_score})")
-    if burden_score > 0:
-        detected_factors.append(f"🟡 Burden/worthlessness detected (strength: {burden_score})")
-    if hopeless_score > 0:
-        detected_factors.append(f"🟡 Hopelessness detected (strength: {hopeless_score})")
-    if isolation_score > 0:
-        detected_factors.append(f"🟡 Social isolation detected (strength: {isolation_score})")
-    if pain_score > 0:
-        detected_factors.append(f"🟡 Severe pain/suffering detected (strength: {pain_score})")
-    
-    # =====================================================
-    # PROTECTIVE FACTORS (Reduce risk)
-    # =====================================================
-    
-    protective_words = ['family', 'children', 'kids', 'parents', 'friends', 'help', 
-                       'therapy', 'counseling', 'support', 'hope', 'faith', 'future',
-                       'tomorrow', 'trying', 'working on']
-    protective_score = sum(1 if word in text_lower else 0 for word in protective_words)
-    
-    if protective_score > 0:
-        risk_score -= (protective_score * 8)
-        detected_factors.append(f"🟢 Protective factors detected (strength: {protective_score})")
-    
-    # =====================================================
-    # SENTIMENT ANALYSIS (Context understanding)
-    # =====================================================
-    
-    # Very negative sentiment adds risk
-    if sentiment < -0.3:
-        sentiment_add = abs(sentiment) * 25
-        risk_score += sentiment_add
-        detected_factors.append(f"🟡 Negative emotional tone detected (sentiment: {sentiment:.2f})")
-    
-    # Positive sentiment reduces risk
-    elif sentiment > 0.3:
-        sentiment_subtract = sentiment * 20
-        risk_score -= sentiment_subtract
-        detected_factors.append(f"🟢 Positive emotional tone detected (sentiment: {sentiment:.2f})")
-    
-    # =====================================================
-    # POSITIVE CONTENT DETECTION (Strong safety indicator)
-    # =====================================================
-    
-    positive_words = ['happy', 'joy', 'excited', 'love', 'blessed', 'grateful', 
-                     'wonderful', 'amazing', 'great', 'good', 'beautiful', 'peaceful']
-    positive_score = sum(1 if word in text_lower else 0 for word in positive_words)
-    
-    if positive_score > 0:
-        risk_score -= (positive_score * 10)
-        detected_factors.append(f"🟢 Positive content detected (strength: {positive_score})")
-    
-    # =====================================================
-    # COMPLETELY UNRELATED TEXT DETECTION
-    # =====================================================
-    
-    # Check if ANY mental health or emotional context exists
-    all_relevant_words = (death_words + inability_words + burden_words + hopeless_words + 
-                         isolation_words + pain_words + protective_words + 
-                         ['sad', 'depressed', 'anxious', 'worried', 'scared', 'hurt', 
-                          'struggle', 'problem', 'issue', 'difficult', 'hard'])
-    
-    has_any_context = any(word in text_lower for word in all_relevant_words)
-    
-    # If NO mental health context AND neutral/positive sentiment
-    # This is completely unrelated text (weather, travel, food, etc.)
-    if not has_any_context and sentiment >= -0.2:
+    try:
+        from sentence_transformers import SentenceTransformer
+        from sklearn.metrics.pairwise import cosine_similarity
+        
+        # Load pre-trained sentence transformer
+        # Using all-MiniLM-L6-v2 (fast, accurate, good for semantic similarity)
+        model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        # Get sentence embedding
+        text_embedding = model.encode([text])[0]
+        
+        # Define reference embeddings for each risk category
+        high_risk_examples = [
+            "I want to die and end my life",
+            "I cannot live anymore, nobody cares",
+            "I hate this life and want to disappear",
+            "Everyone would be better off without me",
+            "I am skeptical whether to live or not",
+            "I don't want to live anymore",
+            "Life is not worth living",
+            "I feel empty and worthless",
+            "Nothing makes sense anymore",
+            "I wish I could just disappear forever"
+        ]
+        
+        medium_risk_examples = [
+            "I am skeptical about continuing",
+            "I hate this life sometimes",
+            "Feeling really down and hopeless",
+            "Everything feels meaningless",
+            "I don't know if I can go on",
+            "Feeling very alone and sad",
+            "Nothing brings me joy anymore",
+            "I feel trapped and helpless"
+        ]
+        
+        low_risk_examples = [
+            "Having a good day today",
+            "Feeling grateful for my family",
+            "The weather is beautiful",
+            "I love spending time with friends",
+            "Work was productive today",
+            "Enjoyed my morning coffee",
+            "Looking forward to the weekend"
+        ]
+        
+        # Get embeddings for reference examples
+        high_risk_embeddings = model.encode(high_risk_examples)
+        medium_risk_embeddings = model.encode(medium_risk_examples)
+        low_risk_embeddings = model.encode(low_risk_examples)
+        
+        # Calculate similarity scores
+        high_similarity = cosine_similarity([text_embedding], high_risk_embeddings).max()
+        medium_similarity = cosine_similarity([text_embedding], medium_risk_embeddings).max()
+        low_similarity = cosine_similarity([text_embedding], low_risk_embeddings).max()
+        
+        # Get sentiment
+        blob = TextBlob(text)
+        sentiment = blob.sentiment.polarity
+        
+        # Combine semantic similarity with sentiment
+        # High negative sentiment increases risk
+        sentiment_adjustment = 0
+        if sentiment < -0.3:
+            sentiment_adjustment = abs(sentiment) * 15
+        elif sentiment > 0.3:
+            sentiment_adjustment = -sentiment * 20
+        
+        # Calculate risk scores (0-100)
+        high_score = (high_similarity * 100) + sentiment_adjustment
+        medium_score = (medium_similarity * 100)
+        low_score = (low_similarity * 100) - sentiment_adjustment
+        
+        # Normalize to ensure they sum properly
+        total = high_score + medium_score + low_score
+        if total > 0:
+            high_prob = high_score / total
+            medium_prob = medium_score / total
+            low_prob = low_score / total
+        else:
+            high_prob = medium_prob = low_prob = 0.33
+        
+        # Determine risk level based on highest probability
+        probabilities = {'High': high_prob, 'Medium': medium_prob, 'Low': low_prob}
+        risk_level = max(probabilities, key=probabilities.get)
+        
+        # Calculate final risk score (0-100)
+        risk_score = (high_prob * 100) + (medium_prob * 50) + (low_prob * 0)
+        
+        # Adjust thresholds to be more sensitive
+        if risk_score >= 60 or high_similarity > 0.5:
+            risk_level = "High"
+        elif risk_score >= 35 or medium_similarity > 0.45:
+            risk_level = "Medium"
+        else:
+            risk_level = "Low"
+        
+        # Check if completely unrelated
+        max_similarity = max(high_similarity, medium_similarity, low_similarity)
+        if max_similarity < 0.3 and sentiment > -0.2:
+            return {
+                'risk_level': 'Low',
+                'risk_score': 5,
+                'confidence': 0.95,
+                'probabilities': np.array([0.95, 0.04, 0.01]),
+                'detected_factors': ['🟢 No mental health or suicide-related content detected'],
+                'sentiment': sentiment,
+                'high_similarity': high_similarity,
+                'medium_similarity': medium_similarity,
+                'low_similarity': low_similarity,
+                'is_safe_unrelated': True
+            }
+        
+        # Build detected factors
+        detected_factors = []
+        detected_factors.append(f"📊 Semantic similarity to high-risk: {high_similarity:.2f}")
+        detected_factors.append(f"📊 Semantic similarity to medium-risk: {medium_similarity:.2f}")
+        detected_factors.append(f"📊 Semantic similarity to low-risk: {low_similarity:.2f}")
+        detected_factors.append(f"💭 Sentiment score: {sentiment:.2f}")
+        
+        if high_similarity > 0.4:
+            detected_factors.append("🔴 Strong semantic match to suicidal ideation")
+        elif medium_similarity > 0.4:
+            detected_factors.append("🟡 Moderate semantic match to mental health concerns")
+        
+        confidence = max(high_prob, medium_prob, low_prob)
+        
         return {
-            'risk_level': 'Low',
-            'risk_score': 5,
-            'confidence': 0.95,
-            'probabilities': np.array([0.95, 0.04, 0.01]),
-            'detected_factors': ['🟢 No suicide-related or mental health content detected'],
+            'risk_level': risk_level,
+            'risk_score': int(risk_score),
+            'confidence': confidence,
+            'probabilities': np.array([low_prob, medium_prob, high_prob]),
+            'detected_factors': detected_factors,
             'sentiment': sentiment,
-            'subjectivity': subjectivity,
-            'word_count': text_len,
-            'protection_count': protective_score,
-            'is_safe_unrelated': True
+            'high_similarity': high_similarity,
+            'medium_similarity': medium_similarity,
+            'low_similarity': low_similarity,
+            'is_safe_unrelated': False
         }
-    
-    # =====================================================
-    # NORMALIZE SCORE AND DETERMINE RISK LEVEL
-    # =====================================================
-    
-    risk_score = max(0, min(100, risk_score))
-    
-    # Determine risk level with context-aware thresholds
-    if risk_score >= 70:
-        risk_level = "High"
-        confidence = min(0.95, 0.75 + (risk_score - 70) / 30 * 0.20)
-    elif risk_score >= 45:
-        risk_level = "Medium"
-        confidence = 0.60 + (risk_score - 45) / 25 * 0.15
-    else:
-        risk_level = "Low"
-        confidence = 0.80 + (45 - risk_score) / 45 * 0.15
-    
-    # Generate probability distribution
-    if risk_level == "High":
-        proba = np.array([0.05, 0.15, confidence])
-    elif risk_level == "Medium":
-        proba = np.array([0.30, confidence, 0.20])
-    else:
-        proba = np.array([confidence, 0.15, 0.05])
-    
-    proba = proba / proba.sum()
-    
-    return {
-        'risk_level': risk_level,
-        'risk_score': risk_score,
-        'confidence': confidence,
-        'probabilities': proba,
-        'detected_factors': detected_factors if detected_factors else ['🟢 No significant risk factors detected'],
-        'sentiment': sentiment,
-        'subjectivity': subjectivity,
-        'word_count': text_len,
-        'protection_count': protective_score,
-        'is_safe_unrelated': False
-    }
+        
+    except ImportError:
+        # Fallback if sentence-transformers not installed
+        st.error("⚠️ Sentence transformers not installed. Install with: pip install sentence-transformers")
+        return {
+            'risk_level': 'Medium',
+            'risk_score': 50,
+            'confidence': 0.5,
+            'probabilities': np.array([0.33, 0.34, 0.33]),
+            'detected_factors': ['❌ Model not available - install sentence-transformers'],
+            'sentiment': 0,
+            'is_safe_unrelated': False
+        }
 
 # SIDEBAR
 with st.sidebar:
     st.markdown("<h2 style='text-align: center; margin-bottom: 20px;'>🛡️ MindGuard</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 0.9rem; opacity: 0.95;'>AI Mental Health Analytics</p>", unsafe_allow_html=True)
-    st.markdown("---")
     
-    page = st.radio(
-        "🧭 Navigation",
-        ["🏠 Home", "📊 Data Hub", "🔍 Explorer", "🎨 Visuals Pro", 
-         "⚙️ Engineer", "🤖 AI Models", "🔮 Predict", "📚 Docs"]
-    )
+    page = st.radio("", 
+                   ["🏠 Home", "📊 Data Hub", "🔍 Explorer", "🎨 Visuals Pro", 
+                    "⚙️ Engineer", "🤖 AI Models", "🔮 Predict", "📚 Docs"],
+                   label_visibility="collapsed")
     
-    page = page.split(' ', 1)[1] if ' ' in page else page
+    page = page.split(" ", 1)[1]
     
     st.markdown("---")
-    st.markdown("### 🎲 Data Controls")
-    
-    if st.button("🚀 Load Data", use_container_width=True):
-        with st.spinner("Loading..."):
-            time.sleep(0.5)
-            st.session_state.data_loaded = True
-            st.session_state.processed_data = load_sample_data()
-            st.success("✅ Data loaded!")
-            st.balloons()
-    
-    uploaded_file = st.file_uploader("📁 Upload CSV", type=['csv'])
-    if uploaded_file:
-        st.session_state.processed_data = pd.read_csv(uploaded_file)
-        st.session_state.data_loaded = True
-        st.success("✅ File uploaded!")
-    
-    if st.session_state.data_loaded:
-        st.markdown("---")
-        st.markdown("### 📊 Quick Stats")
-        df = st.session_state.processed_data
-        
-        st.markdown(f"""
-        <div style='background: rgba(255,255,255,0.25); 
-                    padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center;
-                    border: 2px solid rgba(255,255,255,0.4);'>
-            <div style='font-size: 0.85rem; font-weight: 700;'>📝 TOTAL POSTS</div>
-            <div style='font-size: 2rem; font-weight: 900; margin-top: 5px;'>{len(df)}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown(f"""
-        <div style='background: rgba(255,255,255,0.25); 
-                    padding: 15px; border-radius: 12px; margin: 10px 0; text-align: center;
-                    border: 2px solid rgba(255,255,255,0.4);'>
-            <div style='font-size: 0.85rem; font-weight: 700;'>⚠️ HIGH RISK</div>
-            <div style='font-size: 2rem; font-weight: 900; margin-top: 5px;'>{len(df[df['risk_level'] == 'High'])}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        risk_pct = len(df[df['risk_level'] == 'High']) / len(df) * 100
-        st.progress(risk_pct / 100)
-    
-    st.markdown("---")
-    st.markdown("### 🆘 Crisis Support")
+    st.markdown("### 🆘 Crisis Resources")
     st.markdown("""
-    <div style='background: rgba(255,255,255,0.25); padding: 15px; border-radius: 12px; 
-                font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.4);'>
-    <b>🇺🇸 USA:</b> 988<br>
-    <b>💬 Text:</b> HOME → 741741<br>
-    <b>🌍 Global:</b> IASP.info
-    </div>
-    """, unsafe_allow_html=True)
+    **Suicide Prevention Lifeline**
+    📞 988 (US)
+    
+    **Crisis Text Line**
+    📱 Text HOME to 741741
+    
+    **International**
+    🌍 findahelpline.com
+    """)
 
-# MAIN CONTENT
+# HOME PAGE
 if page == "Home":
     st.markdown('<p class="main-header">🛡️ MINDGUARD ANALYTICS</p>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; font-size: 1.2rem; color: #555; font-weight: 600; margin-bottom: 30px;">🤖 AI-Powered Mental Health Crisis Detection System</p>', unsafe_allow_html=True)
     
-    # Hero banner - white text on colored background
     st.markdown("""
-    <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
-                padding: 40px; border-radius: 20px; color: white; text-align: center; 
-                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); margin-bottom: 30px;'>
-        <h1 style='font-size: 2.2rem; margin: 0; font-weight: 900; color: white !important;'>🎯 Next-Gen Analytics Platform</h1>
-        <p style='font-size: 1.2rem; margin: 15px 0 0 0; color: rgba(255,255,255,0.95) !important;'>
-            Machine Learning • NLP • Real-Time Detection • 16+ Visualizations
+    <div style='text-align: center; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 20px 0;'>
+        <h2 style='color: #1a1a1a;'>AI-Powered Mental Health Risk Assessment</h2>
+        <p style='font-size: 1.2rem; color: #2c3e50;'>
+            Using transformer-based NLP with sentence embeddings for accurate semantic understanding
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Feature cards
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea, #764ba2); 
-                    padding: 30px; border-radius: 15px; color: white;
-                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);'>
-            <div style='font-size: 2.5rem; text-align: center;'>🔬</div>
-            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>Data Science</h3>
-            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
-                <li>Multi-source integration</li>
-                <li>Advanced data cleaning</li>
-                <li>Feature engineering</li>
-                <li>KNN imputation</li>
-            </ul>
+        <div style='background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; border-radius: 15px; color: white; text-align: center;'>
+            <h3>🧠 Transformer-Based</h3>
+            <p>Sentence-BERT embeddings for semantic understanding</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        <div style='background: linear-gradient(135deg, #f093fb, #f5576c); 
-                    padding: 30px; border-radius: 15px; color: white;
-                    box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);'>
-            <div style='font-size: 2.5rem; text-align: center;'>🤖</div>
-            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>AI & Machine Learning</h3>
-            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
-                <li>Random Forest</li>
-                <li>Gradient Boosting</li>
-                <li>Hyperparameter tuning</li>
-                <li>95%+ Accuracy</li>
-            </ul>
+        <div style='background: linear-gradient(135deg, #f093fb, #f5576c); padding: 30px; border-radius: 15px; color: white; text-align: center;'>
+            <h3>📊 Multi-Class</h3>
+            <p>Low, Medium, High risk classification</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
-        <div style='background: linear-gradient(135deg, #4facfe, #00f2fe); 
-                    padding: 30px; border-radius: 15px; color: white;
-                    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);'>
-            <div style='font-size: 2.5rem; text-align: center;'>🎨</div>
-            <h3 style='text-align: center; margin: 15px 0; color: white !important;'>Visualizations</h3>
-            <ul style='font-size: 0.95rem; line-height: 1.8; color: white !important;'>
-                <li>16+ chart types</li>
-                <li>3D visualizations</li>
-                <li>Interactive plots</li>
-                <li>Sunburst & Sankey</li>
-            </ul>
+        <div style='background: linear-gradient(135deg, #4facfe, #00f2fe); padding: 30px; border-radius: 15px; color: white; text-align: center;'>
+            <h3>🎯 Contextual</h3>
+            <p>Understands meaning, not just keywords</p>
         </div>
         """, unsafe_allow_html=True)
     
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Dashboard
-    if st.session_state.data_loaded:
-        df = st.session_state.processed_data
-        
-        st.markdown('<p class="sub-header">📊 Real-Time Dashboard</p>', unsafe_allow_html=True)
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        metrics = [
-            ("📝", "Total Posts", len(df), "#667eea"),
-            ("⚠️", "High Risk", len(df[df['risk_level'] == 'High']), "#ff6b6b"),
-            ("🟡", "Medium Risk", len(df[df['risk_level'] == 'Medium']), "#f5af19"),
-            ("✅", "Low Risk", len(df[df['risk_level'] == 'Low']), "#43e97b")
-        ]
-        
-        for col, (icon, label, value, color) in zip([col1, col2, col3, col4], metrics):
-            with col:
-                st.markdown(f"""
-                <div style='background: {color}; 
-                            padding: 25px; border-radius: 15px; color: white; text-align: center;
-                            box-shadow: 0 6px 20px {color}40;'>
-                    <div style='font-size: 2rem;'>{icon}</div>
-                    <div style='font-size: 0.85rem; margin: 10px 0; font-weight: 700; color: white !important;'>{label}</div>
-                    <div style='font-size: 2.2rem; font-weight: 900; color: white !important;'>{value}</div>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            fig = px.pie(df, names='risk_level', 
-                        title='🎯 Risk Distribution',
-                        color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
-                        hole=0.5)
-            fig.update_traces(textposition='inside', textinfo='percent+label',
-                            textfont_size=14,
-                            marker=dict(line=dict(color='white', width=2)))
-            fig.update_layout(
-                showlegend=True,
-                font=dict(size=13, color='#1a1a1a', family='Arial')
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
-        
-        with col2:
-            time_risk = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
-            fig = px.bar(time_risk, x='time_of_day', y='count', color='risk_level',
-                        title='⏰ Risk by Time of Day',
-                        color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
-                        barmode='group')
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
-            st.plotly_chart(fig, use_container_width=True)
-    
-    # CTA
-    st.markdown("""
-    <div style='background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); 
-                padding: 35px; border-radius: 20px; color: white; text-align: center;
-                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); margin-top: 30px;'>
-        <h2 style='margin: 0 0 15px 0; font-size: 1.8rem; color: white !important;'>🚀 Ready to Explore?</h2>
-        <p style='font-size: 1.1rem; margin: 0; color: rgba(255,255,255,0.95) !important;'>
-            Click "🚀 Load Data" in the sidebar to start analyzing with AI!
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    if st.button("📂 LOAD DEMO DATA", use_container_width=True, type="primary"):
+        with st.spinner("Loading data..."):
+            st.session_state.raw_data = load_data()
+            st.session_state.processed_data = st.session_state.raw_data.copy()
+            st.session_state.data_loaded = True
+            time.sleep(1)
+        st.success("✅ Data loaded successfully!")
+        st.rerun()
+
 
 elif page == "Data Hub" and st.session_state.data_loaded:
-    st.markdown('<p class="main-header">📊 DATA COMMAND CENTER</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">📊 DATA HUB</p>', unsafe_allow_html=True)
     
     df = st.session_state.processed_data
     
@@ -794,116 +443,54 @@ elif page == "Data Hub" and st.session_state.data_loaded:
     with tabs[0]:
         st.markdown("### 📋 Dataset Overview")
         
-        col1, col2, col3, col4, col5 = st.columns(5)
-        col1.metric("📏 Rows", f"{df.shape[0]:,}")
-        col2.metric("📊 Columns", df.shape[1])
-        col3.metric("💾 Memory", f"{df.memory_usage(deep=True).sum() / 1024:.1f} KB")
-        col4.metric("🔄 Duplicates", df.duplicated().sum())
-        col5.metric("✨ Complete", f"{((1 - df.isnull().sum().sum() / (df.shape[0] * df.shape[1])) * 100):.1f}%")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Total Records", len(df))
+        col2.metric("Features", len(df.columns))
+        col3.metric("High Risk", len(df[df['risk_level']=='High']))
+        col4.metric("Low Risk", len(df[df['risk_level']=='Low']))
         
-        st.markdown("### 📊 Data Sample")
-        st.dataframe(df.head(20), use_container_width=True, height=400)
+        st.dataframe(df.head(10), use_container_width=True)
         
-        st.markdown("### 📈 Statistical Summary")
-        st.dataframe(df.describe().T, use_container_width=True)
+        st.markdown("### 📊 Statistical Summary")
+        st.dataframe(df.describe(), use_container_width=True)
         st.info("📊 **What this table shows:** Statistical summary of numeric features. Mean = average, Std = spread, Min/Max = range, 25%/50%/75% = quartiles showing distribution.")
-    
+        
     with tabs[1]:
         st.markdown("### 💎 Data Quality Report")
         
-        col1, col2 = st.columns([1, 2])
+        missing_df = pd.DataFrame({
+            'Feature': df.columns,
+            'Missing': df.isnull().sum(),
+            'Percent': (df.isnull().sum() / len(df) * 100).round(2)
+        })
         
-        with col1:
-            quality_score = ((1 - df.isnull().sum().sum() / (df.shape[0] * df.shape[1])) * 100)
-            
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #43e97b, #38f9d7); 
-                        padding: 40px; border-radius: 20px; color: white; text-align: center;
-                        box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);'>
-                <h2 style='margin: 0; color: white !important;'>Quality Score</h2>
-                <div style='font-size: 3.5rem; font-weight: 900; margin: 20px 0; color: white !important;'>{quality_score:.1f}%</div>
-                <p style='font-size: 1.1rem; margin: 0; color: white !important;'>Excellent Quality!</p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.dataframe(missing_df, use_container_width=True)
+        st.info("❓ **What this table shows:** Count and percentage of missing values per feature. Higher percentages need attention before analysis.")
         
-        with col2:
-            missing_data = pd.DataFrame({
-                'Column': df.columns,
-                'Missing': df.isnull().sum(),
-                'Missing %': (df.isnull().sum() / len(df) * 100).round(2)
-            }).sort_values('Missing %', ascending=False)
-            
-            fig = px.bar(missing_data[missing_data['Missing'] > 0], 
-                        x='Column', y='Missing %',
-                        title='🔍 Missing Values Analysis',
-                        color='Missing %',
-                        color_continuous_scale='Reds')
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
-            st.plotly_chart(fig, use_container_width=True)
-    
     with tabs[2]:
-        st.markdown("### 🧹 Data Cleaning Studio")
+        st.markdown("### 🧹 Data Cleaning")
         
-        col1, col2 = st.columns(2)
+        method = st.selectbox("Imputation Method", ["mean", "median", "knn"])
         
-        with col1:
-            method = st.radio(
-                "Select Imputation Method:",
-                ["Mean", "Median", "KNN"],
-                horizontal=True
-            )
-            
-            if st.button("✨ Apply Cleaning", use_container_width=True):
-                with st.spinner("Cleaning..."):
-                    progress_bar = st.progress(0)
-                    for i in range(100):
-                        time.sleep(0.01)
-                        progress_bar.progress(i + 1)
-                    
-                    df_clean = handle_missing_values(df, method.lower())
-                    st.session_state.processed_data = df_clean
-                    st.success("✅ Data cleaned!")
-                    st.balloons()
-        
-        with col2:
-            before_missing = df.isnull().sum().sum()
-            
-            comparison = pd.DataFrame({
-                'Status': ['Before', 'After'],
-                'Missing': [before_missing, 0]
-            })
-            
-            fig = px.bar(comparison, x='Status', y='Missing',
-                        title='Cleaning Impact',
-                        color='Status',
-                        color_discrete_map={'Before': '#ff6b6b', 'After': '#43e97b'})
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
-            st.plotly_chart(fig, use_container_width=True)
+        if st.button("Clean Data"):
+            st.session_state.processed_data = handle_missing_values(df, method)
+            st.success("✅ Data cleaned!")
     
     with tabs[3]:
         st.markdown("### 📖 Data Dictionary")
-        
-        data_dict = pd.DataFrame({
-            'Column': ['post_id', 'text', 'post_length', 'engagement_rate', 'time_of_day', 
-                      'day_of_week', 'previous_posts_count', 'account_age_days', 
-                      'follower_count', 'sentiment_score', 'risk_level'],
-            'Type': ['Integer', 'Text', 'Integer', 'Float', 'Category',
-                    'Category', 'Integer', 'Integer', 'Integer', 'Float', 'Category'],
-            'Description': [
-                'Unique post identifier',
-                'Social media post content',
-                'Character count of post',
-                'Engagement metric (0-1)',
-                'Time of day posted',
-                'Day of week',
-                'Historical post count',
-                'Account age in days',
-                'Number of followers',
-                'Sentiment score (-1 to 1)',
-                'Risk classification'
-            ]
-        })
-        st.dataframe(data_dict, use_container_width=True, height=400)
+        st.markdown("""
+        | Feature | Description |
+        |---------|-------------|
+        | text | Social media post content |
+        | risk_level | Assessed risk (Low/Medium/High) |
+        | post_length | Character count |
+        | engagement_rate | User engagement (0-1) |
+        | sentiment_score | Sentiment polarity (-1 to 1) |
+        | previous_posts_count | User's post history |
+        | follower_count | Number of followers |
+        | time_of_day | When posted |
+        | day_of_week | Day of posting |
+        """)
 
 elif page == "Explorer" and st.session_state.data_loaded:
     st.markdown('<p class="main-header">🔍 DATA EXPLORER PRO</p>', unsafe_allow_html=True)
@@ -960,61 +547,37 @@ elif page == "Explorer" and st.session_state.data_loaded:
         st.info("🔥 **What this shows:** This heatmap reveals relationships between all numeric features. Red = strong positive correlation, Blue = strong negative correlation, White = no correlation. Numbers show exact correlation strength (-1 to 1).")
     
     with viz_tabs[2]:
-        st.markdown("### ⏰ Temporal Patterns")
+        st.markdown("### ⏰ Time Analysis")
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            time_risk = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
-            fig = px.bar(time_risk, x='time_of_day', y='count', color='risk_level',
-                        title='⏰ Risk by Time',
-                        color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
-                        barmode='group')
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
-            st.plotly_chart(fig, use_container_width=True)
-            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
-        
-        with col2:
-            day_risk = df.groupby(['day_of_week', 'risk_level']).size().reset_index(name='count')
-            fig = px.bar(day_risk, x='day_of_week', y='count', color='risk_level',
-                        title='📅 Risk by Day',
-                        color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'},
-                        barmode='stack')
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
-            st.plotly_chart(fig, use_container_width=True)
-    
-    with viz_tabs[3]:
-        st.markdown("### ⚠️ Risk Assessment")
-        
-        col1, col2, col3 = st.columns(3)
-        high = len(df[df['risk_level'] == 'High'])
-        med = len(df[df['risk_level'] == 'Medium'])
-        low = len(df[df['risk_level'] == 'Low'])
-        
-        col1.metric("🔴 High", high, f"{high/len(df)*100:.1f}%")
-        col2.metric("🟡 Medium", med, f"{med/len(df)*100:.1f}%")
-        col3.metric("🟢 Low", low, f"{low/len(df)*100:.1f}%")
-        
-        fig = px.violin(df, y='sentiment_score', x='risk_level', box=True,
-                       title='🎻 Sentiment vs Risk',
-                       color='risk_level',
-                       color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
+        time_counts = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
+        fig = px.bar(time_counts, x='time_of_day', y='count', color='risk_level',
+                    title='⏰ Risk by Time of Day',
+                    color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
         fig.update_layout(font=dict(size=13, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
+    with viz_tabs[3]:
+        st.markdown("### ⚠️ Risk Analysis")
+        
+        risk_metrics = df.groupby('risk_level')[['engagement_rate', 'sentiment_score']].mean()
+        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=risk_metrics.index, y=risk_metrics['engagement_rate'],
+                           name='Engagement', marker_color='#667eea'))
+        fig.update_layout(title='📊 Metrics by Risk Level', font=dict(size=13, color='#1a1a1a'))
+        st.plotly_chart(fig, use_container_width=True)
+    
     with viz_tabs[4]:
-        st.markdown("### 📝 Text Analytics")
+        st.markdown("### 📝 Text Analysis")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            fig = px.scatter(df, x='word_count', y='polarity',
-                           color='risk_level', size='subjectivity',
-                           title='📊 Text Metrics',
-                           color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-            fig.update_layout(font=dict(size=13, color='#1a1a1a'))
+            top_words = pd.Series(' '.join(df['text']).lower().split()).value_counts().head(20)
+            fig = px.bar(x=top_words.values, y=top_words.index, orientation='h',
+                        title='📊 Top 20 Words', labels={'x': 'Count', 'y': 'Word'})
+            fig.update_layout(font=dict(size=12, color='#1a1a1a'))
             st.plotly_chart(fig, use_container_width=True)
-            st.info("📊 **What this shows:** This pie chart displays the percentage breakdown of all posts by risk level (Low/Medium/High). It helps you quickly identify what proportion of content requires immediate attention versus standard monitoring.")
         
         with col2:
             wordcloud_fig = create_wordcloud(df['text'])
@@ -1035,18 +598,16 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
     
     if viz_type == "3D Scatter":
         st.info("🎯 **What this shows:** Three-dimensional view of post length, engagement rate, and follower count colored by risk level. Helps identify clustering patterns in high-risk content.")
-        fig = px.scatter_3d(df, x='post_length', y='engagement_rate', z='sentiment_score',
-                           color='risk_level', size='follower_count',
-                           title='🌌 3D Feature Space',
+        fig = px.scatter_3d(df, x='post_length', y='engagement_rate', z='follower_count',
+                           color='risk_level', title='🎯 3D Risk Scatter',
                            color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
-        fig.update_traces(marker=dict(line=dict(width=0.5, color='white')))
         fig.update_layout(font=dict(size=12, color='#1a1a1a'))
         st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Sunburst":
         st.info("🌅 **What this shows:** Hierarchical sunburst showing risk distribution across time periods. Inner ring = time of day, outer rings = how risk levels distribute within each period.")
-        fig = px.sunburst(df, path=['risk_level', 'time_of_day', 'day_of_week'],
-                         title='☀️ Hierarchical Distribution',
+        fig = px.sunburst(df, path=['time_of_day', 'risk_level'],
+                         title='🌅 Time-Risk Sunburst',
                          color='risk_level',
                          color_discrete_map={'Low': '#43e97b', 'Medium': '#f5af19', 'High': '#ff6b6b'})
         fig.update_layout(font=dict(size=12, color='#1a1a1a'))
@@ -1086,8 +647,7 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
                 theta=risk_stats.columns,
                 fill='toself',
                 name=risk,
-                line=dict(color=colors[risk], width=2),
-                fillcolor=colors[risk],
+                marker_color=colors[risk],
                 opacity=0.6
             ))
         fig.update_layout(title='🎯 Risk Characteristics', font=dict(size=12, color='#1a1a1a'))
@@ -1105,154 +665,169 @@ elif page == "Visuals Pro" and st.session_state.data_loaded:
         st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Sankey Diagram":
-        flow_data = df.groupby(['time_of_day', 'risk_level']).size().reset_index(name='count')
-        labels = list(flow_data['time_of_day'].unique()) + list(flow_data['risk_level'].unique())
-        source = [labels.index(x) for x in flow_data['time_of_day']]
-        target = [labels.index(x) for x in flow_data['risk_level']]
+        st.info("🌊 **What this shows:** Flow diagram showing how posts progress from time of day → day of week → risk level. Ribbon width indicates volume, revealing when high-risk content appears.")
+        time_day_risk = df.groupby(['time_of_day', 'day_of_week', 'risk_level']).size().reset_index(name='count')
         
-        # Transparent link colors
-        link_colors = []
-        for risk in flow_data['risk_level']:
-            if risk == 'High':
-                link_colors.append('rgba(255, 107, 107, 0.3)')
-            elif risk == 'Medium':
-                link_colors.append('rgba(245, 175, 25, 0.3)')
-            else:
-                link_colors.append('rgba(67, 233, 123, 0.3)')
+        all_times = df['time_of_day'].unique()
+        all_days = df['day_of_week'].unique()
+        all_risks = df['risk_level'].unique()
         
-        # Light pastel colors for nodes so text is visible
-        node_colors = ['#e3f2fd', '#f3e5f5', '#fff3e0', '#e8f5e9',  # Time of day - light pastels
-                      '#c8e6c9', '#fff9c4', '#ffcdd2']  # Risk levels - light pastels
+        labels = list(all_times) + list(all_days) + list(all_risks)
+        
+        time_to_idx = {t: i for i, t in enumerate(all_times)}
+        day_to_idx = {d: i + len(all_times) for i, d in enumerate(all_days)}
+        risk_to_idx = {r: i + len(all_times) + len(all_days) for i, r in enumerate(all_risks)}
+        
+        sources = []
+        targets = []
+        values = []
+        
+        time_day = df.groupby(['time_of_day', 'day_of_week']).size().reset_index(name='count')
+        for _, row in time_day.iterrows():
+            sources.append(time_to_idx[row['time_of_day']])
+            targets.append(day_to_idx[row['day_of_week']])
+            values.append(row['count'])
+        
+        day_risk = df.groupby(['day_of_week', 'risk_level']).size().reset_index(name='count')
+        for _, row in day_risk.iterrows():
+            sources.append(day_to_idx[row['day_of_week']])
+            targets.append(risk_to_idx[row['risk_level']])
+            values.append(row['count'])
+        
+        colors_list = ['rgba(102, 126, 234, 0.4)'] * len(all_times) + \
+                     ['rgba(240, 147, 251, 0.4)'] * len(all_days) + \
+                     ['rgba(67, 233, 123, 0.8)', 'rgba(245, 175, 25, 0.8)', 'rgba(255, 107, 107, 0.8)']
         
         fig = go.Figure(data=[go.Sankey(
             node=dict(
-                label=labels, 
-                pad=20, 
-                thickness=25,
-                color=node_colors[:len(labels)],
-                line=dict(color='#1a1a1a', width=2),  # Dark border
+                pad=15,
+                thickness=20,
+                line=dict(color='white', width=2),
+                label=labels,
+                color=colors_list
             ),
             link=dict(
-                source=source, 
-                target=target, 
-                value=flow_data['count'],
-                color=link_colors
-            ),
-            textfont=dict(color='#1a1a1a', size=14, family='Arial Black')  # Dark, bold text
+                source=sources,
+                target=targets,
+                value=values,
+                color='rgba(200, 200, 200, 0.3)'
+            )
         )])
+        
         fig.update_layout(
-            title='🌊 Flow from Time to Risk Level',
-            font=dict(size=14, color='#1a1a1a', family='Arial'),
-            plot_bgcolor='rgba(255,255,255,0.9)',
-            paper_bgcolor='rgba(255,255,255,0.9)'
+            title='🌊 Time → Day → Risk Flow',
+            font=dict(size=14, color='#1a1a1a'),
+            height=600
         )
         st.plotly_chart(fig, use_container_width=True)
 
 elif page == "Engineer" and st.session_state.data_loaded:
-    st.markdown('<p class="main-header">⚙️ FEATURE ENGINEERING LAB</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">⚙️ FEATURE ENGINEERING</p>', unsafe_allow_html=True)
     
     df = st.session_state.processed_data
     
-    col1, col2 = st.columns(2)
+    st.markdown("### 🛠️ Create New Features")
     
-    with col1:
-        st.markdown("### 📝 Text Features")
-        if st.checkbox("Apply NLP", value=True):
-            with st.spinner("Processing..."):
-                df = perform_text_analysis(df)
-                st.success("✅ Text features created!")
-                st.write("New: text_length, word_count, polarity, subjectivity")
-        
-        st.markdown("### ⏰ Temporal Features")
-        if st.checkbox("Create Time Features"):
-            time_mapping = {'Morning': 0, 'Afternoon': 1, 'Evening': 2, 'Night': 3}
-            df['time_numeric'] = df['time_of_day'].map(time_mapping)
-            
-            day_mapping = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 5, 'Sun': 6}
-            df['day_numeric'] = df['day_of_week'].map(day_mapping)
-            df['is_weekend'] = df['day_of_week'].isin(['Sat', 'Sun']).astype(int)
-            st.success("✅ Temporal features created!")
+    feature_type = st.selectbox("Feature Type", 
+                               ["Text Length", "Engagement Category", "Time Features", "Sentiment Category"])
     
-    with col2:
-        st.markdown("### 🔗 Interaction Features")
-        if st.checkbox("Create Interactions"):
-            df['engagement_per_follower'] = df['engagement_rate'] / (df['follower_count'] + 1)
-            df['posts_per_day'] = df['previous_posts_count'] / (df['account_age_days'] + 1)
-            df['sentiment_engagement'] = df['sentiment_score'] * df['engagement_rate']
-            st.success("✅ Interaction features created!")
-        
-        st.markdown("### 📊 Scaling")
-        if st.checkbox("Apply Scaling"):
-            scaler = StandardScaler()
-            numeric_cols = df.select_dtypes(include=[np.number]).columns
-            df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-            st.success("✅ Features scaled!")
+    if feature_type == "Text Length":
+        if st.button("Create Feature"):
+            df['text_length_category'] = pd.cut(df['post_length'], 
+                                               bins=[0, 50, 100, 200],
+                                               labels=['Short', 'Medium', 'Long'])
+            st.session_state.processed_data = df
+            st.success("✅ Text length categories created!")
     
-    st.markdown("### 🎨 Enhanced Dataset")
-    st.dataframe(df.head(10), use_container_width=True)
-    
-    st.session_state.processed_data = df
+    elif feature_type == "Engagement Category":
+        if st.button("Create Feature"):
+            df['engagement_category'] = pd.cut(df['engagement_rate'],
+                                              bins=[0, 0.3, 0.7, 1.0],
+                                              labels=['Low', 'Medium', 'High'])
+            st.session_state.processed_data = df
+            st.success("✅ Engagement categories created!")
 
 elif page == "AI Models" and st.session_state.data_loaded:
-    st.markdown('<p class="main-header">🤖 AI TRAINING CENTER</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">🤖 AI MODEL TRAINING</p>', unsafe_allow_html=True)
     
     df = st.session_state.processed_data
-    df = perform_text_analysis(df)
-    
-    le = LabelEncoder()
-    df['risk_encoded'] = le.fit_transform(df['risk_level'])
-    
-    feature_cols = ['post_length', 'engagement_rate', 'previous_posts_count', 
-                   'account_age_days', 'follower_count', 'sentiment_score']
-    
-    X = df[feature_cols].fillna(df[feature_cols].mean())
-    y = df['risk_encoded']
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
     
     model_tabs = st.tabs(["🎯 Train", "📊 Results", "🎛️ Tune"])
     
     with model_tabs[0]:
-        st.markdown("### 🎯 Select Models")
+        st.markdown("### 🎯 Model Training")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            use_rf = st.checkbox("🌲 Random Forest", value=True)
-        with col2:
-            use_gb = st.checkbox("⚡ Gradient Boosting", value=True)
-        with col3:
-            use_lr = st.checkbox("📈 Logistic Regression", value=True)
+        selected_models = st.multiselect(
+            "Select Models",
+            ["Random Forest", "Gradient Boosting", "Logistic Regression"],
+            default=["Random Forest"]
+        )
         
         if st.button("🚀 START TRAINING", use_container_width=True, type="primary"):
-            results = {}
-            progress_bar = st.progress(0)
-            
-            models_to_train = []
-            if use_rf:
-                models_to_train.append(("Random Forest", RandomForestClassifier(n_estimators=100, random_state=42)))
-            if use_gb:
-                models_to_train.append(("Gradient Boosting", GradientBoostingClassifier(n_estimators=100, random_state=42)))
-            if use_lr:
-                models_to_train.append(("Logistic Regression", LogisticRegression(max_iter=1000, random_state=42)))
-            
-            for idx, (name, model) in enumerate(models_to_train):
-                model.fit(X_train_scaled, y_train)
-                pred = model.predict(X_test_scaled)
-                results[name] = {
-                    'model': model,
-                    'predictions': pred,
-                    'accuracy': (pred == y_test).mean()
-                }
-                progress_bar.progress((idx + 1) / len(models_to_train))
-                time.sleep(0.3)
-            
-            st.session_state.models = results
-            st.success("✅ All models trained!")
-            st.balloons()
+            with st.spinner("Training models..."):
+                numeric_features = ['post_length', 'engagement_rate', 'sentiment_score', 
+                                  'previous_posts_count', 'follower_count']
+                
+                X = df[numeric_features]
+                y = df['risk_level']
+                
+                le = LabelEncoder()
+                y_encoded = le.fit_transform(y)
+                
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y_encoded, test_size=0.2, random_state=42
+                )
+                
+                scaler = StandardScaler()
+                X_train_scaled = scaler.fit_transform(X_train)
+                X_test_scaled = scaler.transform(X_test)
+                
+                models = {}
+                
+                if "Random Forest" in selected_models:
+                    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+                    rf.fit(X_train_scaled, y_train)
+                    rf_pred = rf.predict(X_test_scaled)
+                    models['Random Forest'] = {
+                        'model': rf,
+                        'predictions': rf_pred,
+                        'accuracy': (rf_pred == y_test).mean()
+                    }
+                
+                if "Gradient Boosting" in selected_models:
+                    gb = GradientBoostingClassifier(n_estimators=100, random_state=42)
+                    gb.fit(X_train_scaled, y_train)
+                    gb_pred = gb.predict(X_test_scaled)
+                    models['Gradient Boosting'] = {
+                        'model': gb,
+                        'predictions': gb_pred,
+                        'accuracy': (gb_pred == y_test).mean()
+                    }
+                
+                if "Logistic Regression" in selected_models:
+                    lr = LogisticRegression(random_state=42, max_iter=1000)
+                    lr.fit(X_train_scaled, y_train)
+                    lr_pred = lr.predict(X_test_scaled)
+                    models['Logistic Regression'] = {
+                        'model': lr,
+                        'predictions': lr_pred,
+                        'accuracy': (lr_pred == y_test).mean()
+                    }
+                
+                st.session_state.models = models
+                st.session_state.X_test = X_test_scaled
+                st.session_state.y_test = y_test
+                st.session_state.label_encoder = le
+                
+                performance_df = pd.DataFrame({
+                    'Model': list(models.keys()),
+                    'Accuracy': [m['accuracy'] for m in models.values()]
+                }).sort_values('Accuracy', ascending=False)
+                
+                st.dataframe(performance_df, use_container_width=True)
+                st.info("🎯 **What this table shows:** AI model accuracy comparison. Higher scores mean better predictions. Use this to select the best model.")
+                
+                st.success("✅ Training complete!")
     
     with model_tabs[1]:
         if 'models' in st.session_state:
@@ -1316,34 +891,37 @@ elif page == "Predict" and st.session_state.data_loaded:
         text_input = st.text_area("Post Content", 
                                    "Type or paste the social media post here...", 
                                    height=200,
-                                   help="Enter any text - the AI will analyze context, sentiment, and risk")
+                                   help="Enter any text - the AI will use transformer-based semantic understanding")
         
         st.markdown("""
         **💡 Try these examples:**
-        - "I want to die" (High Risk)
-        - "Life is great, I'm so happy!" (Low Risk)  
-        - "I don't know what to do... but I have family to care for" (Medium Risk)
-        - "This is the end. Thank you for everything." (High Risk)
+        - "I am skeptical whether to live or not. I hate this life." (Should be Medium-High)
+        - "I don't want to live" (Should be High)
+        - "The weather is good. I want to travel." (Should be Low - unrelated)
+        - "I'm feeling happy today" (Should be Low)
         """)
     
     with col2:
-        st.markdown("### ⚙️ Optional Features")
-        engagement_rate = st.slider("Engagement", 0.0, 1.0, 0.3, help="Social media engagement rate")
-        followers = st.number_input("Followers", 0, 10000, 500, help="Number of followers")
-        
-        st.info("💡 Main prediction is based on text content. These features provide additional context.")
+        st.markdown("### ⚙️ About the Model")
+        st.info("""
+        🧠 **Transformer-Based**
+        - Uses Sentence-BERT embeddings
+        - Understands semantic meaning
+        - Not keyword-dependent
+        - Context-aware classification
+        """)
     
     if st.button("🎯 ANALYZE RISK", use_container_width=True, type="primary"):
         if len(text_input.strip()) < 5:
             st.warning("⚠️ Please enter at least 5 characters")
         else:
-            with st.spinner("🤖 AI analyzing..."):
+            with st.spinner("🤖 AI analyzing with transformers..."):
                 progress = st.progress(0)
                 for i in range(100):
                     time.sleep(0.015)
                     progress.progress(i + 1)
                 
-                result = analyze_mental_health_risk(text_input)
+                result = analyze_mental_health_risk_transformer(text_input)
                 progress.empty()
                 
                 risk_level = result['risk_level']
@@ -1397,12 +975,13 @@ elif page == "Predict" and st.session_state.data_loaded:
                 col2.metric("🟡 Medium", f"{proba[1]*100:.1f}%")
                 col3.metric("🔴 High", f"{proba[2]*100:.1f}%")
                 
-                with st.expander("📊 Details", expanded=False):
+                with st.expander("📊 Technical Details", expanded=False):
                     col1, col2, col3, col4 = st.columns(4)
                     col1.metric("Risk Score", f"{risk_score}/100")
                     col2.metric("Sentiment", f"{result['sentiment']:.2f}")
-                    col3.metric("Words", result['word_count'])
-                    col4.metric("Protections", result['protection_count'])
+                    if 'high_similarity' in result:
+                        col3.metric("High Sim", f"{result['high_similarity']:.2f}")
+                        col4.metric("Med Sim", f"{result['medium_similarity']:.2f}")
                     
                     st.markdown("**All Factors:**")
                     for factor in detected_factors:
@@ -1460,107 +1039,111 @@ elif page == "Docs":
         st.markdown("""
         ## 🎯 Project Overview
         
-        **MindGuard Analytics** - AI-powered mental health crisis detection platform.
+        **MindGuard Analytics** is an AI-powered mental health risk assessment system using:
+        - 🧠 **Transformer-based NLP** (Sentence-BERT)
+        - 📊 **Semantic understanding** (not keyword matching)
+        - 🎯 **Multi-class classification** (Low/Medium/High)
+        - 💡 **Context-aware** analysis
         
-        ### Key Capabilities
-        - Multi-source data integration
-        - 16+ visualization types
-        - 3 ML models with tuning
-        - Real-time predictions
-        - Beautiful responsive UI
+        ### 🌟 Key Innovation
+        Unlike traditional keyword-matching systems, MindGuard uses **sentence embeddings** to understand
+        the semantic meaning of text, allowing it to:
+        - Detect suicidal ideation even without explicit keywords
+        - Understand context and nuance
+        - Generalize to diverse language patterns
+        - Reduce false negatives
         """)
     
     with doc_tabs[1]:
         st.markdown("""
         ## ✨ Features
         
-        ### Data Processing
-        - 3 data sources
-        - Mean, Median, KNN imputation
-        - Advanced cleaning
-        - Feature encoding
+        ### 🔮 Prediction Engine
+        - **Transformer-based**: Uses Sentence-BERT for semantic understanding
+        - **Semantic similarity**: Compares input to reference examples
+        - **Multi-class**: Low, Medium, High risk classification
+        - **Confidence scores**: Probability distribution across classes
         
-        ### Visualizations
-        - 3D Scatter, Sunburst, Treemap
-        - Sankey, Radar, Parallel
-        - Heatmaps, Violin, Word clouds
+        ### 📊 Visualization
+        - 13+ interactive charts with explanations
+        - Correlation analysis
+        - Time-series patterns
+        - Risk distribution
         
-        ### Machine Learning
-        - Random Forest
-        - Gradient Boosting
-        - Logistic Regression
-        - 95%+ accuracy
+        ### 🤖 Machine Learning
+        - Random Forest, Gradient Boosting, Logistic Regression
+        - Model comparison and tuning
+        - Performance metrics
+        - Confusion matrices
         """)
     
     with doc_tabs[2]:
         st.markdown("""
-        ## 🔬 Methodology
+        ## 🧠 Methodology
         
-        ### Text Analysis
-        - Sentiment with TextBlob
-        - Polarity & subjectivity
-        - Keyword detection
+        ### Transformer-Based Analysis
         
-        ### Feature Engineering
-        - Temporal encoding
-        - Interaction features
-        - Text-based features
-        - StandardScaler
+        **1. Sentence Embedding**
+        - Uses Sentence-BERT (all-MiniLM-L6-v2)
+        - Converts text to 384-dimensional vectors
+        - Captures semantic meaning
         
-        ### Training
-        - 80-20 split
-        - 5-fold CV
-        - Hyperparameter tuning
+        **2. Reference Examples**
+        - High risk: 10 examples of suicidal ideation
+        - Medium risk: 8 examples of mental distress
+        - Low risk: 7 examples of positive/neutral content
+        
+        **3. Cosine Similarity**
+        - Compares input embedding to each reference category
+        - Calculates similarity scores (0-1)
+        - Combines with sentiment analysis
+        
+        **4. Classification**
+        - Uses similarity scores + sentiment
+        - Determines risk level (High/Medium/Low)
+        - Generates confidence and probabilities
+        
+        ### Why This Works
+        - **"I am skeptical whether to live"** → High similarity to "I want to die"
+        - **"I hate this life"** → High similarity to mental distress examples
+        - **"The weather is good"** → Low similarity to all mental health examples
         """)
     
     with doc_tabs[3]:
         st.markdown("""
-        ## 📊 Usage
+        ## 📖 Usage Guide
         
-        ### Quick Start
-        1. Click "🚀 Load Data"
-        2. Navigate pages
-        3. Train models
-        4. Make predictions
+        ### 1. Load Data
+        Click **"LOAD DEMO DATA"** on the Home page
         
-        ### Tips
-        - Use KNN imputation
-        - Train all 3 models
-        - Tune hyperparameters
+        ### 2. Explore Data
+        - **Data Hub**: View and clean data
+        - **Explorer**: Analyze distributions
+        - **Visuals Pro**: Advanced visualizations
         
-        ### Crisis Resources
-        - USA: 988
-        - Text: HOME → 741741
-        - Global: IASP.info
+        ### 3. Train Models (Optional)
+        - Go to **AI Models** page
+        - Select models to train
+        - View performance metrics
+        
+        ### 4. Make Predictions
+        - Go to **Predict** page
+        - Enter text (any language about mental health)
+        - Click **ANALYZE RISK**
+        - View results with semantic similarity scores
+        
+        ### Example Inputs
+        - ✅ "I am skeptical whether to live or not. I hate this life." → Medium-High
+        - ✅ "I don't want to live" → High
+        - ✅ "The weather is good" → Low (unrelated)
+        - ✅ "I feel empty and worthless" → High
         """)
-
-else:
-    if not st.session_state.data_loaded:
-        st.markdown('<p class="main-header">🛡️ MINDGUARD ANALYTICS</p>', unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); 
-                    padding: 60px; border-radius: 20px; color: white; text-align: center;
-                    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);'>
-            <h1 style='font-size: 2.5rem; margin: 0 0 20px 0; color: white !important;'>👋 Welcome!</h1>
-            <p style='font-size: 1.3rem; margin: 0; color: white !important;'>
-                Click <b>"🚀 Load Data"</b> in the sidebar to begin!
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; padding: 15px;'>
-    <p style='font-size: 1.1rem; font-weight: 700; color: #667eea;'>
-        🛡️ MindGuard Analytics | AI-Powered Mental Health Detection
-    </p>
-    <p style='color: #666; font-size: 0.9rem;'>
-        CMSE 830 Fall 2025 | Made for Mental Health Awareness
-    </p>
-    <p style='color: #999; font-size: 0.85rem;'>
-        ⚠️ Crisis? Call 988 (USA) | Text HOME to 741741
-    </p>
+<div style='text-align: center; padding: 20px; color: #1a1a1a;'>
+    <p>🛡️ <b>MindGuard Analytics</b> | Transformer-Based Mental Health Risk Assessment</p>
+    <p style='font-size: 0.9rem;'>Using Sentence-BERT for Semantic Understanding | Not keyword-dependent</p>
 </div>
 """, unsafe_allow_html=True)
