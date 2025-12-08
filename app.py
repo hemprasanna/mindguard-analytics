@@ -236,7 +236,33 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 2: CHECK FOR POSITIVE CONTENT (ONLY IF NOT NEGATIVE ABOVE)
+    # STEP 2: CHECK FOR SELF-HARM (EVEN WITHOUT SUICIDE INTENT)
+    # =================================================================
+    
+    # Self-harm indicators (MEDIUM-HIGH RISK)
+    self_harm_phrases = [
+        'harm myself', 'hurt myself', 'injure myself', 'cut myself',
+        'burn myself', 'poison myself', 'damage myself',
+        'harm my body', 'hurt my body', 'self harm', 'self-harm'
+    ]
+    
+    has_self_harm = any(phrase in text_lower for phrase in self_harm_phrases)
+    
+    if has_self_harm:
+        # Self-harm is MEDIUM-HIGH RISK (not necessarily suicidal but dangerous)
+        return {
+            'risk_level': 'Medium',
+            'risk_score': 65,
+            'confidence': 0.80,
+            'probabilities': np.array([0.10, 0.70, 0.20]),
+            'detected_factors': ['🟡 Self-harm intent detected',
+                               '⚠️ Indicates intention to cause physical harm'],
+            'sentiment': sentiment,
+            'is_safe_unrelated': False
+        }
+    
+    # =================================================================
+    # STEP 3: CHECK FOR POSITIVE CONTENT (ONLY IF NOT NEGATIVE/SELF-HARM)
     # =================================================================
     
     # Positive life-affirming phrases
@@ -263,7 +289,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 3: CHECK FOR UNRELATED CONTENT (NO MENTAL HEALTH CONTEXT)
+    # STEP 4: CHECK FOR UNRELATED CONTENT (NO MENTAL HEALTH CONTEXT)
     # =================================================================
     
     # Mental health / emotional keywords
@@ -290,7 +316,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 4: ANALYZE RISK LEVEL (ONLY IF HAS MENTAL HEALTH CONTEXT)
+    # STEP 5: ANALYZE RISK LEVEL (ONLY IF HAS MENTAL HEALTH CONTEXT)
     # =================================================================
     
     # HIGH RISK INDICATORS (+35 to +45 each)
@@ -386,7 +412,7 @@ def analyze_mental_health_risk_reliable(text):
     risk_score = max(0, min(100, risk_score))
     
     # =================================================================
-    # STEP 5: CLASSIFY BASED ON RISK SCORE
+    # STEP 6: CLASSIFY BASED ON RISK SCORE
     # =================================================================
     
     if risk_score >= 70:
