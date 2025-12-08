@@ -211,7 +211,66 @@ def analyze_mental_health_risk_reliable(text):
     detected_factors = []
     
     # =================================================================
-    # STEP 1: CHECK FOR NEGATIVE/DANGEROUS CONTENT FIRST (HIGHEST PRIORITY!)
+    # STEP 1: CHECK FOR SUICIDE METHODS (HIGHEST PRIORITY!)
+    # =================================================================
+    
+    # Specific suicide methods (IMMEDIATE HIGH RISK)
+    suicide_methods = [
+        # Jumping
+        'jump from', 'jump off', 'jumping from', 'jumping off',
+        'jump in front', 'jump into traffic', 'jump into the',
+        
+        # Vehicles/trains
+        'in front of train', 'in front of bus', 'in front of car',
+        'in front of truck', 'front of a train', 'front of a bus',
+        'under a train', 'under a bus', 'under a car',
+        'hit by train', 'hit by bus', 'hit by car',
+        'running train', 'running bus', 'running vehicle',
+        'moving train', 'moving bus', 'moving vehicle',
+        
+        # Hanging
+        'hang myself', 'hanging myself', 'hang me',
+        
+        # Drowning
+        'drown myself', 'drowning myself',
+        
+        # Machines/dangerous objects
+        'head inside', 'head in', 'head into',
+        'running machine', 'moving machine',
+        
+        # Sharp objects
+        'stab myself', 'stabbing myself', 'poke myself with knife',
+        'poke myself with a knife', 'stab myself with knife',
+        'cut my throat', 'slit my wrist', 'knife to myself',
+        
+        # Poison/overdose
+        'drink poison', 'take poison', 'swallow poison',
+        'overdose', 'pills to die', 'poison myself',
+        'food that has poison', 'poisoned food',
+        
+        # Shooting
+        'shoot myself', 'shooting myself', 'gun to my head',
+        
+        # Other methods
+        'electrocute myself', 'set myself on fire', 'burn alive'
+    ]
+    
+    has_suicide_method = any(method in text_lower for method in suicide_methods)
+    
+    if has_suicide_method:
+        return {
+            'risk_level': 'High',
+            'risk_score': 95,
+            'confidence': 0.95,
+            'probabilities': np.array([0.02, 0.08, 0.90]),
+            'detected_factors': ['🔴 CRITICAL: Specific suicide method detected',
+                               '🚨 Immediate intervention required'],
+            'sentiment': sentiment,
+            'is_safe_unrelated': False
+        }
+    
+    # =================================================================
+    # STEP 2: CHECK FOR NEGATIVE LIFE PHRASES
     # =================================================================
     
     # Check for "DON'T want to live" / "NOT want to live" BEFORE checking "want to live"
@@ -236,7 +295,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 2: CHECK FOR SELF-HARM (EVEN WITHOUT SUICIDE INTENT)
+    # STEP 3: CHECK FOR SELF-HARM (EVEN WITHOUT SUICIDE INTENT)
     # =================================================================
     
     # Self-harm indicators (MEDIUM-HIGH RISK)
@@ -262,7 +321,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 3: CHECK FOR POSITIVE CONTENT (ONLY IF NOT NEGATIVE/SELF-HARM)
+    # STEP 4: CHECK FOR POSITIVE CONTENT (ONLY IF NOT NEGATIVE/SELF-HARM)
     # =================================================================
     
     # Positive life-affirming phrases
@@ -289,7 +348,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 4: CHECK FOR UNRELATED CONTENT (NO MENTAL HEALTH CONTEXT)
+    # STEP 5: CHECK FOR UNRELATED CONTENT (NO MENTAL HEALTH CONTEXT)
     # =================================================================
     
     # Mental health / emotional keywords
@@ -316,7 +375,7 @@ def analyze_mental_health_risk_reliable(text):
         }
     
     # =================================================================
-    # STEP 5: ANALYZE RISK LEVEL (ONLY IF HAS MENTAL HEALTH CONTEXT)
+    # STEP 6: ANALYZE RISK LEVEL (ONLY IF HAS MENTAL HEALTH CONTEXT)
     # =================================================================
     
     # HIGH RISK INDICATORS (+35 to +45 each)
@@ -412,7 +471,7 @@ def analyze_mental_health_risk_reliable(text):
     risk_score = max(0, min(100, risk_score))
     
     # =================================================================
-    # STEP 6: CLASSIFY BASED ON RISK SCORE
+    # STEP 7: CLASSIFY BASED ON RISK SCORE
     # =================================================================
     
     if risk_score >= 70:
