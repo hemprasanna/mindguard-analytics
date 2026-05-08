@@ -156,7 +156,7 @@ def load_data():
         'follower_count': np.random.randint(10, 10000, n),
         'time_of_day': np.random.choice(['Morning', 'Afternoon', 'Evening', 'Night'], n),
         'day_of_week': np.random.choice(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], n),
-        'timestamp': pd.date_range('2024-01-01', periods=n, freq='H')
+        'timestamp': pd.date_range('2024-01-01', periods=n, freq='h')
     }
     
     return pd.DataFrame(data)
